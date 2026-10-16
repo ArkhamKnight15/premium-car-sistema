@@ -186,6 +186,8 @@ select t.ok((select count(*) = 1 from public.order_events where order_id = t.u('
 insert into storage.objects (bucket_id, name) values ('order-photos', 'orders/' || t.v('os1') || '/entrada-frente.jpg');
 insert into public.order_photos (order_id, storage_path, kind, caption) values (t.u('os1'), 'orders/' || t.v('os1') || '/entrada-frente.jpg', 'entry', 'Frente');
 select t.throws($$insert into storage.objects (bucket_id, name) values ('order-photos', 'outra/pasta.jpg')$$, 'row-level', 'envio fora da pasta de uma OS é bloqueado');
+select t.throws(format($$insert into public.order_photos (order_id, storage_path) values (%L, %L)$$, t.v('os1'), 'orders/' || t.v('os1') || '/nao-enviado.jpg'), 'não encontrado', 'registro de foto exige o arquivo no Storage');
+select t.ok((select uploaded_by = :JOAO from public.order_photos where caption = 'Frente'), 'autor da foto é o usuário da sessão');
 select public.remove_order_photo((select id from public.order_photos limit 1));
 select t.ok((select removed_at is not null and removed_by = :JOAO from public.order_photos limit 1), 'remoção de foto é lógica e registrada');
 call t.login(:NOVO);

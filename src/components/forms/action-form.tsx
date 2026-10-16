@@ -28,17 +28,26 @@ export function FormMessage({ state, className }: { state: ActionResult | null |
  * Formulário ligado a uma Server Action: mostra sucesso/erro, erros por campo,
  * estado de carregamento (via SubmitButton) e redireciona quando a ação pede.
  */
-export function ActionForm({ action, children, className, reset, messageOnTop, id, onSuccessRedirect }: {
+export function ActionForm({ action, children, className, reset, messageOnTop, id, onSuccessRedirect, afterSuccess }: {
   action: FormAction; children: ReactNode; className?: string; reset?: boolean; messageOnTop?: boolean; id?: string; onSuccessRedirect?: string;
+  /** Etapa extra no navegador após o sucesso (ex.: enviar fotos); pode trocar o destino. */
+  afterSuccess?: (state: ActionResult) => Promise<string | void>;
 }) {
   const [state, formAction] = useActionState(action, null);
   const ref = useRef<HTMLFormElement>(null);
   const router = useRouter();
+  const handled = useRef<ActionResult | null>(null);
+  const after = useRef(afterSuccess);
+  after.current = afterSuccess;
   useEffect(() => {
-    if (!state?.ok) return;
+    if (!state?.ok || handled.current === state) return;
+    handled.current = state;
     if (reset) ref.current?.reset();
-    const to = state.redirect ?? onSuccessRedirect;
-    if (to) router.push(to);
+    void (async () => {
+      const override = after.current ? await after.current(state) : undefined;
+      const to = override || state.redirect || onSuccessRedirect;
+      if (to) router.push(to);
+    })();
   }, [state, reset, router, onSuccessRedirect]);
   return (
     <ResultContext.Provider value={state}>

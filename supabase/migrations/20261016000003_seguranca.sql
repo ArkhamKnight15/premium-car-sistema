@@ -88,6 +88,28 @@ language sql immutable as $$
 $$;
 grant execute on function public.order_id_from_path(text) to authenticated, service_role;
 
+-- O navegador envia o arquivo direto ao Storage (sem passar pelo servidor da
+-- aplicação); o registro na OS só é aceito se o arquivo existir na pasta da
+-- própria OS. O autor é sempre o usuário da sessão.
+create or replace function public.photos_before() returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  if public.order_id_from_path(new.storage_path) is distinct from new.order_id then
+    raise exception 'O arquivo não pertence a esta OS.' using errcode = '22023';
+  end if;
+  if not exists (select 1 from storage.objects where bucket_id = 'order-photos' and name = new.storage_path) then
+    raise exception 'Arquivo da foto não encontrado no armazenamento.' using errcode = '22023';
+  end if;
+  if not public.is_privileged() then
+    new.uploaded_by := auth.uid();
+    new.removed_at := null;
+    new.removed_by := null;
+  end if;
+  return new;
+end;
+$$;
+create trigger photos_before before insert on public.order_photos for each row execute function public.photos_before();
+
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values ('order-photos', 'order-photos', false, 10485760, array['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif'])
 on conflict (id) do nothing;

@@ -2,8 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   experimental: {
-    // envio de várias fotos de entrada de uma vez
-    serverActions: { bodySizeLimit: "30mb" },
+    // fotos vão direto do navegador ao Supabase Storage; formulários são pequenos
+    serverActions: { bodySizeLimit: "2mb" },
   },
   async headers() {
     return [

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Camera, Plus, Trash2 } from "lucide-react";
 import { ActionForm, Field, useFormResult } from "@/components/forms/action-form";
 import { SubmitButton } from "@/components/forms/submit-button";
@@ -10,7 +10,9 @@ import { FUEL_LEVELS } from "@/lib/constants";
 import { minutes, money, moneyInput } from "@/lib/format";
 import { parseMoney } from "@/lib/validation";
 import type { Employee, Service } from "@/lib/types";
-import { openOrder } from "@/actions/orders";
+import { checkPhotos, uploadOrderPhotos } from "@/lib/photo-upload";
+import type { ActionResult } from "@/lib/types";
+import { openOrder, registerPhotos } from "@/actions/orders";
 
 type Row = { key: string; service_id: string | null; description: string; quantity: string; unit_price: string; discount: string; employee_id: string };
 
@@ -39,7 +41,28 @@ export function EntryForm({ services, employees, canDiscount, defaults }: { serv
   );
   const [picker, setPicker] = useState("");
   const [orderDiscount, setOrderDiscount] = useState("0,00");
-  const [photoCount, setPhotoCount] = useState(0);
+  const [photos, setPhotos] = useState<File[]>([]);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const [uploading, setUploading] = useState<string | null>(null);
+  const previews = useMemo(() => photos.map((f) => URL.createObjectURL(f)), [photos]);
+  useEffect(() => () => previews.forEach((u) => URL.revokeObjectURL(u)), [previews]);
+
+  function pickPhotos(list: FileList | null) {
+    const next = [...photos, ...Array.from(list ?? [])];
+    const err = checkPhotos(next);
+    setPhotoError(err);
+    if (!err) setPhotos(next);
+  }
+
+  // Depois de abrir a OS, as fotos vão direto do navegador para o Storage privado.
+  async function sendPhotos(state: ActionResult) {
+    const orderId = (state.data as { orderId?: string } | undefined)?.orderId;
+    if (!orderId || !photos.length) return;
+    const { paths, failed } = await uploadOrderPhotos(orderId, photos, (d, t) => setUploading(`Enviando fotos ${d}/${t}…`));
+    const saved = paths.length ? await registerPhotos(orderId, "entry", null, paths) : null;
+    setUploading(null);
+    if (failed.length || (saved && !saved.ok)) return `/ordens/${orderId}?fotos=falha`;
+  }
 
   const lineTotal = (r: Row) => Math.max(0, (Number(r.quantity.replace(",", ".")) || 0) * (parseMoney(r.unit_price) ?? 0) - (parseMoney(r.discount) ?? 0));
   const subtotal = rows.reduce((a, r) => a + lineTotal(r), 0);
@@ -71,7 +94,7 @@ export function EntryForm({ services, employees, canDiscount, defaults }: { serv
   );
 
   return (
-    <ActionForm action={openOrder} className="space-y-6">
+    <ActionForm action={openOrder} afterSuccess={sendPhotos} className="space-y-6">
       <input type="hidden" name="customer_id" value={defaults.customerId} />
       <input type="hidden" name="vehicle_id" value={defaults.vehicleId} />
       {defaults.appointmentId ? <input type="hidden" name="appointment_id" value={defaults.appointmentId} /> : null}
@@ -185,19 +208,35 @@ export function EntryForm({ services, employees, canDiscount, defaults }: { serv
         <Field name="notes" label="Observações" className="sm:col-span-6">
           <Textarea id="notes" name="notes" rows={2} defaultValue={defaults.notes ?? ""} placeholder="Pedidos do cliente, combinados, cuidados especiais…" />
         </Field>
-        <Field name="photos" label="Fotos de entrada" className="sm:col-span-6" hint="Até 15 fotos (JPG, PNG, WEBP ou HEIC, até 10 MB cada). No celular, abre a câmera.">
+        <div className="sm:col-span-6">
+          <Label htmlFor="photos">Fotos de entrada</Label>
           <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-ink-700 bg-ink-925 px-4 py-4 text-sm text-ink-300 hover:border-gold-500/50">
             <Camera className="h-5 w-5 text-gold-400" />
-            <span>{photoCount ? `${photoCount} foto(s) selecionada(s)` : "Tirar ou escolher fotos"}</span>
-            <input id="photos" name="photos" type="file" accept="image/*" multiple capture="environment" className="sr-only"
-              onChange={(e) => setPhotoCount(e.currentTarget.files?.length ?? 0)} />
+            <span>{photos.length ? `${photos.length} foto(s) — toque para adicionar mais` : "Tirar ou escolher fotos"}</span>
+            {/* sem "name": as fotos não vão no formulário, e sim direto ao Storage */}
+            <input id="photos" type="file" accept="image/*" multiple capture="environment" className="sr-only"
+              onChange={(e) => { pickPhotos(e.currentTarget.files); e.currentTarget.value = ""; }} />
           </label>
-        </Field>
+          {photoError ? <p className="mt-1 text-xs text-red-300" role="alert">{photoError}</p> : <p className="mt-1 text-xs text-ink-500">Até 15 fotos (JPG, PNG, WEBP ou HEIC). As fotos grandes são reduzidas antes do envio.</p>}
+          {photos.length ? (
+            <ul className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
+              {photos.map((f, i) => (
+                <li key={previews[i]} className="relative overflow-hidden rounded-md border border-ink-800 bg-ink-900">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={previews[i]} alt={f.name} className="aspect-square w-full object-cover" />
+                  <button type="button" onClick={() => setPhotos((p) => p.filter((_, j) => j !== i))} aria-label={`Remover ${f.name}`}
+                    className="absolute right-1 top-1 rounded bg-black/70 p-1 text-ink-100 hover:text-red-300"><Trash2 className="h-3.5 w-3.5" /></button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
       </section>
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink-800 pt-5">
         <p className="text-xs text-ink-500">A data e hora de entrada e o seu usuário são registrados automaticamente.</p>
-        <SubmitButton size="lg" disabled={rows.length === 0} pendingText="Abrindo OS…">
+        {uploading ? <p className="text-sm text-gold-300" role="status">{uploading}</p> : null}
+        <SubmitButton size="lg" disabled={rows.length === 0 || !!uploading} pendingText="Abrindo OS…">
           <Plus /> Registrar entrada e abrir OS
         </SubmitButton>
       </div>

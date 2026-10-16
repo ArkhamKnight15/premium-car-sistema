@@ -29,10 +29,11 @@ export default async function EntryPage({ searchParams }: { searchParams: Promis
   const supabase = await createClient();
 
   // Conversão de agendamento: traz cliente, veículo e serviços do compromisso
-  let appointment: (Appointment & { appointment_services: { service_id: string }[] }) | null = null;
+  type ApptWithServices = Appointment & { appointment_services: { service_id: string }[] };
+  let appointment: ApptWithServices | null = null;
   if (sp.agendamento) {
     const { data } = await supabase.from("appointments").select("*, appointment_services(service_id)").eq("id", sp.agendamento).in("status", ["scheduled", "confirmed"]).maybeSingle();
-    appointment = data as typeof appointment;
+    appointment = data as ApptWithServices | null;
   }
   const customerId = appointment?.customer_id ?? sp.cliente;
   const vehicleId = appointment?.vehicle_id ?? sp.veiculo;

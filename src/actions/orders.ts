@@ -1,6 +1,5 @@
 "use server";
 
-import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { requireAdmin, requireUser } from "@/lib/auth";
@@ -9,9 +8,8 @@ import { fromLocalInput } from "@/lib/format";
 import { parseMoney, uuid } from "@/lib/validation";
 import { dbFail, fail, ok } from "@/lib/action";
 import { digits } from "@/lib/utils";
-import type { ActionResult, OrderStatus, PhotoKind } from "@/lib/types";
+import type { ActionResult, OrderStatus } from "@/lib/types";
 
-type Supa = Awaited<ReturnType<typeof createClient>>;
 
 const str = (fd: FormData, k: string) => {
   const v = fd.get(k);
@@ -26,36 +24,7 @@ function touch(orderId: string) {
   revalidatePath("/dashboard");
 }
 
-const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
-const MAX_PHOTO = 10 * 1024 * 1024;
-
-function photoFiles(fd: FormData, key = "photos") {
-  return fd.getAll(key).filter((f): f is File => f instanceof File && f.size > 0);
-}
-
-function validatePhotos(files: File[]) {
-  if (files.length > 15) return "Envie no máximo 15 fotos por vez.";
-  for (const f of files) {
-    if (!IMAGE_TYPES.includes(f.type)) return `Formato não suportado: ${f.name}. Use JPG, PNG, WEBP ou HEIC.`;
-    if (f.size > MAX_PHOTO) return `${f.name} tem mais de 10 MB.`;
-  }
-  return null;
-}
-
-/** Envia ao bucket privado (caminho imprevisível) e registra na OS. */
-async function storePhotos(supabase: Supa, orderId: string, files: File[], kind: PhotoKind, caption: string | null) {
-  let sent = 0;
-  for (const f of files) {
-    const ext = (f.name.split(".").pop() ?? "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
-    const path = `orders/${orderId}/${randomUUID()}.${ext}`;
-    const up = await supabase.storage.from("order-photos").upload(path, f, { contentType: f.type, upsert: false });
-    if (up.error) break;
-    const { error } = await supabase.from("order_photos").insert({ order_id: orderId, storage_path: path, kind, caption });
-    if (error) break;
-    sent++;
-  }
-  return sent;
-}
+const PHOTO_KINDS = ["entry", "damage", "progress", "final"] as const;
 
 // ---------------------------------------------------------------------------
 // Abertura (entrada do veículo)
@@ -88,10 +57,6 @@ export async function openOrder(_: ActionResult | null, fd: FormData): Promise<A
     if (Math.round((it.quantity * it.unit_price - it.discount) * 100) < 0) return fail(`Desconto maior que o valor em “${it.description}”.`);
   }
 
-  const files = photoFiles(fd);
-  const photoError = validatePhotos(files);
-  if (photoError) return fail(photoError, { photos: photoError });
-
   const discount = parseMoney(fd.get("discount")) ?? 0;
   const supabase = await createClient();
   const { data: orderId, error } = await supabase.rpc("open_service_order", {
@@ -114,13 +79,9 @@ export async function openOrder(_: ActionResult | null, fd: FormData): Promise<A
   const mileage = intOrNull(str(fd, "mileage_km"));
   if (mileage !== null) await supabase.from("vehicles").update({ mileage_km: mileage }).eq("id", vehicleId);
 
-  let message = "Entrada registrada e OS aberta.";
-  if (files.length) {
-    const sent = await storePhotos(supabase, orderId as string, files, "entry", null);
-    if (sent < files.length) message += ` Atenção: ${files.length - sent} foto(s) não foram enviadas; anexe-as na OS.`;
-  }
+  // As fotos de entrada são enviadas pelo navegador logo em seguida (registerPhotos).
   touch(orderId as string);
-  return ok(message, { redirect: `/ordens/${orderId}` });
+  return ok("Entrada registrada e OS aberta.", { redirect: `/ordens/${orderId}`, data: { orderId: orderId as string } });
 }
 
 // ---------------------------------------------------------------------------
@@ -274,20 +235,24 @@ export async function removeItem(_: ActionResult | null, fd: FormData): Promise<
 // ---------------------------------------------------------------------------
 // Fotos
 // ---------------------------------------------------------------------------
-export async function uploadPhotos(_: ActionResult | null, fd: FormData): Promise<ActionResult> {
+/**
+ * Registra na OS as fotos que o navegador já enviou ao Storage.
+ * O banco confere que cada arquivo existe e está na pasta desta OS.
+ */
+export async function registerPhotos(orderId: string, kind: string, caption: string | null, paths: string[]): Promise<ActionResult> {
   await requireUser();
-  const orderId = String(fd.get("order_id"));
-  const kind = z.enum(["entry", "damage", "progress", "final"]).safeParse(fd.get("kind"));
-  if (!kind.success) return fail("Tipo de foto inválido.");
-  const files = photoFiles(fd);
-  if (!files.length) return fail("Selecione ao menos uma foto.", { photos: "Selecione ao menos uma foto." });
-  const err = validatePhotos(files);
-  if (err) return fail(err, { photos: err });
+  if (!uuid.safeParse(orderId).success) return fail("OS inválida.");
+  const k = z.enum(PHOTO_KINDS).safeParse(kind);
+  if (!k.success) return fail("Tipo de foto inválido.");
+  const pattern = new RegExp(`^orders/${orderId}/[0-9a-f-]{36}\\.(jpg|png|webp|heic|heif)$`);
+  const list = z.array(z.string().regex(pattern)).min(1).max(15).safeParse(paths);
+  if (!list.success) return fail("Arquivos de foto inválidos.");
+  const text = caption?.trim().slice(0, 160) || null;
   const supabase = await createClient();
-  const sent = await storePhotos(supabase, orderId, files, kind.data, str(fd, "caption"));
+  const { error } = await supabase.from("order_photos").insert(list.data.map((p) => ({ order_id: orderId, storage_path: p, kind: k.data, caption: text })));
+  if (error) return dbFail(error);
   touch(orderId);
-  if (sent === 0) return fail("Não foi possível enviar as fotos. Verifique sua permissão e a conexão.");
-  return ok(sent === files.length ? `${sent} foto(s) anexada(s).` : `${sent} de ${files.length} foto(s) enviadas.`);
+  return ok(`${list.data.length} foto(s) anexada(s).`);
 }
 
 export async function removePhoto(_: ActionResult | null, fd: FormData): Promise<ActionResult> {

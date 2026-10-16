@@ -21,16 +21,18 @@ import { OrderItems } from "@/components/domain/order-items";
 import { QuickStatus } from "@/components/domain/quick-status";
 import { StatusPanel } from "@/components/domain/status-panel";
 import { LiveRefresh } from "@/components/layout/realtime";
+import { PhotoUploader } from "@/components/domain/photo-uploader";
 import { FUEL_LEVELS, PHOTO_KIND } from "@/lib/constants";
 import { dateTime, km, money, moneyInput, osNumber, phone, since, toLocalInput } from "@/lib/format";
 import type { Customer, OrderEvent, OrderItem, OrderPhoto, Payment, ServiceOrder, Vehicle } from "@/lib/types";
-import { addNote, refundPayment, registerPayment, removePhoto, setOrderDiscount, updateOrderInfo, uploadPhotos } from "@/actions/orders";
+import { addNote, refundPayment, registerPayment, removePhoto, setOrderDiscount, updateOrderInfo } from "@/actions/orders";
 
 export const metadata: Metadata = { title: "Ordem de serviço" };
 
-export default async function OrderPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function OrderPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ fotos?: string }> }) {
   const { profile, isAdmin } = await requireUser();
   const { id } = await params;
+  const { fotos } = await searchParams;
   const supabase = await createClient();
   const { data: o } = await supabase.from("service_orders").select("*").eq("id", id).maybeSingle<ServiceOrder>();
   if (!o) notFound(); // inexistente ou sem permissão (RLS)
@@ -80,6 +82,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
           </>
         }
       />
+      {fotos === "falha" ? <Alert tone="warn" className="mb-5">OS aberta, mas algumas fotos de entrada não foram enviadas. Anexe-as novamente na seção Fotos.</Alert> : null}
       {o.status === "cancelled" ? <Alert tone="error" className="mb-5">OS cancelada em {dateTime(o.cancelled_at)} — {o.cancel_reason}</Alert> : null}
 
       <Card className="mb-6 p-4">
@@ -115,17 +118,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
                 </div>
               )}
               {!locked ? (
-                <ActionForm action={uploadPhotos} reset className="mt-5 grid gap-3 border-t border-ink-800 pt-5 sm:grid-cols-6 sm:items-end">
-                  <input type="hidden" name="order_id" value={id} />
-                  <Field name="kind" label="Tipo" className="sm:col-span-2">
-                    <Select id="kind" name="kind" defaultValue={o.status === "received" || o.status === "evaluation" ? "entry" : ["completed", "awaiting_pickup"].includes(o.status) ? "final" : "progress"}>
-                      {Object.entries(PHOTO_KIND).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
-                    </Select>
-                  </Field>
-                  <Field name="caption" label="Legenda" className="sm:col-span-4"><Input id="caption" name="caption" placeholder="Opcional" /></Field>
-                  <Field name="photos" label="Arquivos" className="sm:col-span-4"><Input id="photos" name="photos" type="file" accept="image/*" multiple capture="environment" className="pt-2" /></Field>
-                  <SubmitButton variant="secondary" className="sm:col-span-2" pendingText="Enviando…"><Camera /> Anexar fotos</SubmitButton>
-                </ActionForm>
+                <PhotoUploader orderId={id} defaultKind={o.status === "received" || o.status === "evaluation" ? "entry" : ["completed", "awaiting_pickup"].includes(o.status) ? "final" : "progress"} />
               ) : null}
             </CardBody>
           </Card>
