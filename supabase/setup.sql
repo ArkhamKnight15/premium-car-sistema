@@ -1470,3 +1470,24 @@ insert into public.services (name, description, category, default_price, estimat
   ('Revitalização de faróis', 'Lixamento, polimento e proteção UV.', 'Acabamento', 180, 120, 100),
   ('Serviço personalizado', 'Para serviços fora do catálogo: ajuste a descrição e o valor na OS.', 'Outros', 0, 60, 110)
 on conflict do nothing;
+
+-- Primeiro administrador: usuários criados em Authentication → Users ANTES desta
+-- instalação ganham o perfil, e o mais antigo vira administrador (se ainda não houver um).
+insert into public.profiles (id, full_name, email)
+select id, split_part(email, '@', 1), lower(email) from auth.users
+on conflict (id) do nothing;
+
+with primeiro as (
+  select p.id from public.profiles p
+  where not exists (select 1 from public.profiles where role = 'admin')
+  order by p.created_at, p.email limit 1
+)
+update public.profiles set role = 'admin', active = true, perm_payments = true, perm_discounts = true
+where id in (select id from primeiro);
+
+insert into public.employees (full_name, job_title, profile_id)
+select p.full_name, 'Administrador', p.id from public.profiles p
+where p.role = 'admin' and not exists (select 1 from public.employees e where e.profile_id = p.id);
+
+-- Resultado: deve listar o seu e-mail como admin
+select email, role, active from public.profiles;
