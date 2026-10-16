@@ -28,7 +28,7 @@ Copie `.env.example` para `.env.local` e preencha com os dados de *Project Setti
 
 ```bash
 npm install
-npm run criar-admin -- --email voce@empresa.com --nome "Seu Nome" --senha "SenhaForte123"
+npm run criar-admin -- voce@empresa.com "SenhaForte123" "Seu Nome"
 npm run dev   # http://localhost:3000
 ```
 
