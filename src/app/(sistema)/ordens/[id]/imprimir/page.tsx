@@ -6,7 +6,7 @@ import { ChevronLeft } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getEmployees, getSettings } from "@/lib/data";
-import { ORDER_STATUS, PAYMENT_STATUS, isReady } from "@/lib/constants";
+import { ORDER_STATUS, PAYMENT_STATUS } from "@/lib/constants";
 import { dateTime, doc, km, money, osNumber, phone, plate } from "@/lib/format";
 import type { Customer, OrderItem, ServiceOrder, Vehicle } from "@/lib/types";
 import { BrandLogo } from "@/components/layout/logo";
@@ -40,8 +40,9 @@ export default async function PrintOrderPage({ params }: { params: Promise<{ id:
     supabase.from("service_order_items").select("*").eq("order_id", id).order("created_at"),
   ]);
   const responsible = employees.find((e) => e.id === o.responsible_id)?.full_name;
-  // Veículo pronto: o horário é o momento em que a OS é gerada para envio ao cliente
-  const readyAt = isReady(o.status) ? new Date() : null;
+  // Horário em que o veículo ficou pronto: gravado pelo banco ao passar para Concluído/Aguardando retirada
+  // e mantido depois da entrega (volta a vazio se a OS retornar para execução ou for cancelada)
+  const readyAt = o.completed_at;
   const s = settings;
   const cust = c.data;
   const veh = v.data;
