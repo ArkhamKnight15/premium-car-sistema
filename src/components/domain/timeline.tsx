@@ -10,7 +10,7 @@ const ICONS: Record<string, LucideIcon> = {
   refund: Undo2, updated: Pencil,
 };
 const COLORS: Record<string, string> = {
-  created: "text-gold-300 border-gold-500/40", status: "text-sky-300 border-sky-400/30", payment: "text-emerald-300 border-emerald-400/30",
+  created: "text-brand-300 border-brand-500/40", status: "text-sky-300 border-sky-400/30", payment: "text-emerald-300 border-emerald-400/30",
   refund: "text-red-300 border-red-400/30", note: "text-ink-100 border-ink-600",
 };
 

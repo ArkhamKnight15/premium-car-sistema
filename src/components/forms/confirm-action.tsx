@@ -32,7 +32,7 @@ export function ConfirmAction({
           {extra}
           {reasonPlaceholder ? (
             <input name="reason" required={reasonRequired} minLength={reasonRequired ? 3 : undefined} placeholder={reasonPlaceholder} autoFocus
-              className="h-9 w-full rounded-md border border-ink-700 bg-ink-925 px-2.5 text-sm text-ink-100 placeholder:text-ink-500 focus:border-gold-500 focus:outline-none" />
+              className="h-9 w-full rounded-md border border-ink-700 bg-ink-925 px-2.5 text-sm text-ink-100 placeholder:text-ink-500 focus:border-brand-500 focus:outline-none" />
           ) : null}
           <div className="flex flex-wrap gap-2">
             <Button type="submit" size="sm" variant={variant === "danger" ? "danger" : "primary"} disabled={pending}>

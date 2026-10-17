@@ -109,8 +109,8 @@ async function Summary({ from, to, supabase }: { from: string; to: string; supab
               <div className="thin-scroll flex h-52 items-end gap-1.5 overflow-x-auto pb-1" role="img" aria-label="Gráfico de faturamento por dia">
                 {days.map(([d, v]) => (
                   <div key={d} className="group flex min-w-[22px] flex-1 flex-col items-center justify-end gap-1" title={`${date(`${d}T12:00:00Z`)}: ${money(v)}`}>
-                    <span className="hidden whitespace-nowrap text-[10px] tabular-nums text-gold-300 group-hover:block">{money(v)}</span>
-                    <div className={`w-full rounded-t ${v >= 0 ? "bg-gold-500/80 group-hover:bg-gold-400" : "bg-red-400/70"}`} style={{ height: `${Math.max(3, (Math.abs(v) / max) * 170)}px` }} />
+                    <span className="hidden whitespace-nowrap text-[10px] tabular-nums text-brand-300 group-hover:block">{money(v)}</span>
+                    <div className={`w-full rounded-t ${v >= 0 ? "bg-brand-500/80 group-hover:bg-brand-400" : "bg-red-400/70"}`} style={{ height: `${Math.max(3, (Math.abs(v) / max) * 170)}px` }} />
                     <span className="text-[9px] tabular-nums text-ink-500">{d.slice(8)}/{d.slice(5, 7)}</span>
                   </div>
                 ))}
@@ -124,14 +124,14 @@ async function Summary({ from, to, supabase }: { from: string; to: string; supab
             {byMethod.size === 0 ? <p className="text-ink-400">—</p> : [...byMethod.entries()].sort((a, b) => b[1].rec - a[1].rec).map(([m, v]) => (
               <div key={m}>
                 <div className="flex justify-between gap-2"><span>{m} <span className="text-ink-500">({v.n})</span></span><span className="tabular-nums">{money(v.rec - v.ref)}</span></div>
-                <div className="mt-1 h-1.5 rounded-full bg-ink-800"><div className="h-full rounded-full bg-gold-500" style={{ width: `${received ? Math.max(2, ((v.rec - v.ref) / Math.max(received - refunded, 1)) * 100) : 0}%` }} /></div>
+                <div className="mt-1 h-1.5 rounded-full bg-ink-800"><div className="h-full rounded-full bg-brand-500" style={{ width: `${received ? Math.max(2, ((v.rec - v.ref) / Math.max(received - refunded, 1)) * 100) : 0}%` }} /></div>
                 {v.ref ? <p className="mt-0.5 text-[11px] text-red-300">{money(v.ref)} estornado</p> : null}
               </div>
             ))}
           </CardBody>
         </Card>
         <Card className="lg:col-span-3">
-          <CardHeader title="Serviços mais realizados no período" description="Pelas OS com entrada no período (exceto canceladas)" action={<Link href={`/relatorios?tipo=servicos&de=${from}&ate=${to}`} className="text-xs font-semibold text-gold-300">Relatório completo</Link>} />
+          <CardHeader title="Serviços mais realizados no período" description="Pelas OS com entrada no período (exceto canceladas)" action={<Link href={`/relatorios?tipo=servicos&de=${from}&ate=${to}`} className="text-xs font-semibold text-brand-300">Relatório completo</Link>} />
           {topRows.length === 0 ? <EmptyState icon={Receipt} title="Sem serviços no período" className="py-6" /> : (
             <DataTable head={["Serviço", "Vezes", "Valor em serviços"]} align={["left", "right", "right"]} minWidth={480}>
               {topRows.map((t) => <tr key={t.service}><td>{t.service}</td><td className="text-right tabular-nums">{t.times}</td><td className="text-right tabular-nums">{money(t.revenue)}</td></tr>)}
@@ -186,8 +186,8 @@ async function Movements({ sp, from, to, supabase, methods }: { sp: SP; from: st
           {rows.map((r) => (
             <tr key={r.id}>
               <td className="whitespace-nowrap text-ink-300">{dateTime(r.paid_at)}</td>
-              <td>{r.order ? <Link href={`/ordens/${r.order.id}`} className="font-semibold text-gold-300 hover:underline">{osNumber(r.order.number)}</Link> : "—"}</td>
-              <td>{r.order?.customer ? <Link href={`/clientes/${r.order.customer.id}`} className="hover:text-gold-300">{r.order.customer.full_name}</Link> : "—"}</td>
+              <td>{r.order ? <Link href={`/ordens/${r.order.id}`} className="font-semibold text-brand-300 hover:underline">{osNumber(r.order.number)}</Link> : "—"}</td>
+              <td>{r.order?.customer ? <Link href={`/clientes/${r.order.customer.id}`} className="hover:text-brand-300">{r.order.customer.full_name}</Link> : "—"}</td>
               <td className="text-ink-300">{r.method?.name}</td>
               <td className={`text-right tabular-nums ${r.status === "refunded" ? "text-ink-500 line-through" : ""}`}>{money(r.amount)}</td>
               <td>{r.status === "refunded" ? <span title={r.refund_reason ?? ""}><Badge tone="red">Estornado {date(r.refunded_at)}</Badge></span> : <Badge tone="green">Confirmado</Badge>}</td>
@@ -228,13 +228,13 @@ async function Pending({ supabase, sp }: { supabase: Supa; sp: SP }) {
         <DataTable head={["OS", "Cliente", "Entrada", "Situação", "Total", "Pago", "Saldo", "Pagamento"]} align={["left", "left", "left", "left", "right", "right", "right", "left"]} minWidth={900}>
           {rows.map((r) => (
             <tr key={r.id}>
-              <td><Link href={`/ordens/${r.id}`} className="font-semibold text-gold-300 hover:underline">{osNumber(r.number)}</Link></td>
-              <td>{r.customer ? <Link href={`/clientes/${r.customer.id}`} className="hover:text-gold-300">{r.customer.full_name}</Link> : "—"}</td>
+              <td><Link href={`/ordens/${r.id}`} className="font-semibold text-brand-300 hover:underline">{osNumber(r.number)}</Link></td>
+              <td>{r.customer ? <Link href={`/clientes/${r.customer.id}`} className="hover:text-brand-300">{r.customer.full_name}</Link> : "—"}</td>
               <td className="whitespace-nowrap text-ink-300">{date(r.entered_at)}</td>
               <td className="text-ink-300">{r.status === "delivered" ? `Entregue ${date(r.delivered_at)}` : "Na empresa"}</td>
               <td className="text-right tabular-nums">{money(r.total)}</td>
               <td className="text-right tabular-nums text-ink-300">{money(r.amount_paid)}</td>
-              <td className="text-right font-semibold tabular-nums text-gold-300">{money(Number(r.total) - Number(r.amount_paid))}</td>
+              <td className="text-right font-semibold tabular-nums text-brand-300">{money(Number(r.total) - Number(r.amount_paid))}</td>
               <td><PaymentBadge status={r.payment_status} /></td>
             </tr>
           ))}

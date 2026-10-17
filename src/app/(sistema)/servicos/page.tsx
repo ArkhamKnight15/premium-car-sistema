@@ -69,12 +69,12 @@ export default async function ServicesPage() {
                       {s.description ? <p className="mt-0.5 text-sm text-ink-400">{s.description}</p> : null}
                       <p className="mt-1 text-xs text-ink-500">{minutes(s.estimated_minutes)} · usado em {uses.get(s.id) ?? 0} OS</p>
                     </div>
-                    <p className="text-base font-semibold tabular-nums text-gold-300">{money(s.default_price)}</p>
+                    <p className="text-base font-semibold tabular-nums text-brand-300">{money(s.default_price)}</p>
                   </div>
                   {isAdmin ? (
                     <div className="mt-3 flex flex-wrap items-start gap-2">
                       <details className="group w-full">
-                        <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 text-xs font-semibold text-gold-300"><Pencil className="h-3.5 w-3.5" /> Editar</summary>
+                        <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 text-xs font-semibold text-brand-300"><Pencil className="h-3.5 w-3.5" /> Editar</summary>
                         <div className="mt-3 rounded-lg border border-ink-800 bg-ink-925 p-4"><ServiceForm s={s} categories={categories} /></div>
                       </details>
                       {s.active ? (
@@ -92,7 +92,7 @@ export default async function ServicesPage() {
         </Card>
         {isAdmin ? (
           <Card className="h-fit">
-            <CardHeader title={<span className="flex items-center gap-2"><Plus className="h-4 w-4 text-gold-400" /> Novo serviço</span>} />
+            <CardHeader title={<span className="flex items-center gap-2"><Plus className="h-4 w-4 text-brand-400" /> Novo serviço</span>} />
             <CardBody><ServiceForm categories={categories} /></CardBody>
           </Card>
         ) : null}

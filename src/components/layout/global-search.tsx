@@ -90,7 +90,7 @@ export function GlobalSearch({ className, autoFocus, onNavigate }: { className?:
           }}
           placeholder="Buscar cliente, placa ou nº da OS"
           aria-label="Pesquisa global"
-          className="h-10 w-full rounded-lg border border-ink-700 bg-ink-925 pl-9 pr-16 text-sm text-ink-100 placeholder:text-ink-500 focus:border-gold-500/60 focus:outline-none focus:ring-2 focus:ring-gold-500/15"
+          className="h-10 w-full rounded-lg border border-ink-700 bg-ink-925 pl-9 pr-16 text-sm text-ink-100 placeholder:text-ink-500 focus:border-brand-500/60 focus:outline-none focus:ring-2 focus:ring-brand-500/15"
         />
         <span className="absolute right-2.5 top-1/2 flex -translate-y-1/2 items-center gap-1.5">
           {pending ? <Loader2 className="h-3.5 w-3.5 animate-spin text-ink-400" /> : null}
@@ -115,7 +115,7 @@ export function GlobalSearch({ className, autoFocus, onNavigate }: { className?:
                   <li key={`${h.kind}-${h.id}`} role="option" aria-selected={i === active}>
                     <button type="button" onMouseEnter={() => setActive(i)} onClick={() => go(h)}
                       className={cn("flex w-full items-center gap-3 px-4 py-2.5 text-left", i === active ? "bg-ink-800" : "")}>
-                      <Icon className="h-4 w-4 shrink-0 text-gold-400" aria-hidden />
+                      <Icon className="h-4 w-4 shrink-0 text-brand-400" aria-hidden />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm text-ink-100">{h.title}</span>
                         <span className="block truncate text-xs text-ink-400">{LABEL[h.kind]}{h.subtitle ? ` · ${h.subtitle}` : ""}</span>

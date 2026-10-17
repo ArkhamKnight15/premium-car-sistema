@@ -30,7 +30,7 @@ export function EmptyState({ icon: Icon, title, description, action, className }
   return (
     <div className={cn("flex flex-col items-center justify-center px-6 py-12 text-center", className)}>
       <span className="flex h-11 w-11 items-center justify-center rounded-full border border-ink-700 bg-ink-850">
-        <Icon className="h-5 w-5 text-gold-400" aria-hidden />
+        <Icon className="h-5 w-5 text-brand-400" aria-hidden />
       </span>
       <p className="mt-3 text-sm font-semibold text-ink-100">{title}</p>
       {description ? <p className="mt-1 max-w-sm text-sm text-ink-400">{description}</p> : null}
@@ -43,16 +43,16 @@ export function Stat({ label, value, icon: Icon, href, hint, highlight }: {
   label: string; value: ReactNode; icon: LucideIcon; href?: string; hint?: ReactNode; highlight?: boolean;
 }) {
   const content = (
-    <div className={cn("h-full rounded-xl border bg-ink-900 p-4 shadow-card transition-colors", highlight ? "border-gold-500/30" : "border-ink-800", href && "group-hover:border-ink-600")}>
+    <div className={cn("h-full rounded-xl border bg-ink-900 p-4 shadow-card transition-colors", highlight ? "border-brand-500/30" : "border-ink-800", href && "group-hover:border-ink-600")}>
       <div className="flex items-start justify-between gap-2">
         <p className="text-[11px] font-semibold uppercase leading-tight tracking-wider text-ink-400">{label}</p>
-        <Icon className={cn("h-4 w-4 shrink-0", highlight ? "text-gold-400" : "text-ink-500")} aria-hidden />
+        <Icon className={cn("h-4 w-4 shrink-0", highlight ? "text-brand-400" : "text-ink-500")} aria-hidden />
       </div>
       <p className="mt-2 text-2xl font-semibold tabular-nums tracking-tight text-ink-100">{value}</p>
       {hint ? <p className="mt-1 text-xs text-ink-400">{hint}</p> : null}
     </div>
   );
-  return href ? <Link href={href} className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400">{content}</Link> : content;
+  return href ? <Link href={href} className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400">{content}</Link> : content;
 }
 
 export function Alert({ tone = "info", children, className, icon: Icon }: { tone?: "info" | "warn" | "error" | "success"; children: ReactNode; className?: string; icon?: LucideIcon }) {
@@ -114,7 +114,7 @@ export function Tabs({ tabs, active }: { tabs: { id: string; label: string; href
       {tabs.map((t) => (
         <Link key={t.id} href={t.href} aria-current={t.id === active ? "page" : undefined}
           className={cn("flex shrink-0 items-center gap-1.5 border-b-2 px-3 py-2.5 text-sm font-medium transition-colors",
-            t.id === active ? "border-gold-500 text-ink-100" : "border-transparent text-ink-400 hover:text-ink-100")}>
+            t.id === active ? "border-brand-500 text-ink-100" : "border-transparent text-ink-400 hover:text-ink-100")}>
           {t.label}
           {t.count !== undefined ? <span className="rounded-full bg-ink-800 px-1.5 text-[10px] tabular-nums text-ink-300">{t.count}</span> : null}
         </Link>

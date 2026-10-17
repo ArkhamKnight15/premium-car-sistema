@@ -33,7 +33,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         </Field>
         <SubmitButton className="w-full" size="lg" pendingText="Entrando…">Entrar</SubmitButton>
         <p className="text-center text-sm">
-          <Link href="/esqueci-senha" className="text-gold-300 hover:text-gold-200">Esqueci minha senha</Link>
+          <Link href="/esqueci-senha" className="text-brand-300 hover:text-brand-200">Esqueci minha senha</Link>
         </p>
       </ActionForm>
     </AuthShell>

@@ -200,9 +200,9 @@ export function ContactImporter({ defaultDdd, guide }: { defaultDdd: string; gui
       <ol className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs font-medium" aria-label="Etapas da importação">
         {STEPS.map((label, i) => (
           <li key={label} className="flex items-center gap-3" aria-current={i === step ? "step" : undefined}>
-            <span className={cn("flex items-center gap-2", i === step ? "text-ink-100" : i < step ? "text-gold-300" : "text-ink-500")}>
+            <span className={cn("flex items-center gap-2", i === step ? "text-ink-100" : i < step ? "text-brand-300" : "text-ink-500")}>
               <span className={cn("flex h-6 w-6 items-center justify-center rounded-full border text-[11px] tabular-nums transition-colors",
-                i === step ? "border-gold-500 bg-gold-500 text-ink-950" : i < step ? "border-gold-500/50 text-gold-300" : "border-ink-700")}>
+                i === step ? "border-brand-500 bg-brand-500 text-ink-950" : i < step ? "border-brand-500/50 text-brand-300" : "border-ink-700")}>
                 {i < step ? <CheckCircle2 className="h-3.5 w-3.5" aria-hidden /> : i + 1}
               </span>
               {label}
@@ -223,8 +223,8 @@ export function ContactImporter({ defaultDdd, guide }: { defaultDdd: string; gui
                 onDrop={onDrop}
                 className={cn(
                   "flex min-h-64 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-10 text-center transition-colors",
-                  "has-[:focus-visible]:border-gold-500/70 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-gold-400/40",
-                  dragging ? "border-gold-500 bg-gold-500/5" : "border-ink-700 bg-ink-925 hover:border-ink-600 hover:bg-ink-850",
+                  "has-[:focus-visible]:border-brand-500/70 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand-400/40",
+                  dragging ? "border-brand-500 bg-brand-500/5" : "border-ink-700 bg-ink-925 hover:border-ink-600 hover:bg-ink-850",
                   phase === "reading" && "pointer-events-none",
                 )}
               >
@@ -232,17 +232,17 @@ export function ContactImporter({ defaultDdd, guide }: { defaultDdd: string; gui
                   className="sr-only" disabled={phase === "reading"} onChange={(e) => void handleFile(e.target.files?.[0])} />
                 {phase === "reading" ? (
                   <span className="flex flex-col items-center gap-3 animate-in" role="status">
-                    <Loader2 className="h-8 w-8 animate-spin text-gold-400" aria-hidden />
+                    <Loader2 className="h-8 w-8 animate-spin text-brand-400" aria-hidden />
                     <span className="text-sm font-medium text-ink-100">{readingStep}</span>
                     <span className="text-xs text-ink-500">{fileName}</span>
                   </span>
                 ) : (
                   <>
                     <span className="flex h-12 w-12 items-center justify-center rounded-full border border-ink-700 bg-ink-850">
-                      <Upload className="h-5 w-5 text-gold-400" aria-hidden />
+                      <Upload className="h-5 w-5 text-brand-400" aria-hidden />
                     </span>
                     <span className="mt-4 text-sm font-semibold text-ink-100">Arraste o arquivo de contatos aqui</span>
-                    <span className="mt-1 text-sm text-ink-400">ou <span className="text-gold-300 underline-offset-2 hover:underline">clique para escolher</span></span>
+                    <span className="mt-1 text-sm text-ink-400">ou <span className="text-brand-300 underline-offset-2 hover:underline">clique para escolher</span></span>
                     <span className="mt-3 text-xs text-ink-500">vCard (.vcf) ou CSV · até 10 MB</span>
                   </>
                 )}
@@ -265,7 +265,7 @@ export function ContactImporter({ defaultDdd, guide }: { defaultDdd: string; gui
         <Card className="animate-in">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-ink-800 px-5 py-3.5">
             <p className="flex min-w-0 items-center gap-2 text-sm text-ink-300">
-              <FileText className="h-4 w-4 shrink-0 text-gold-400" aria-hidden />
+              <FileText className="h-4 w-4 shrink-0 text-brand-400" aria-hidden />
               <span className="truncate font-medium text-ink-100">{fileName}</span>
             </p>
             <Button variant="ghost" size="sm" onClick={reset}>Trocar arquivo</Button>
@@ -294,7 +294,7 @@ export function ContactImporter({ defaultDdd, guide }: { defaultDdd: string; gui
                 ["all", "Todos", counts.total - imported.size],
               ] as const).map(([id, label, count]) => (
                 <button key={id} type="button" aria-pressed={filter === id} onClick={() => { setFilter(id); setLimit(PAGE); }}
-                  className={cn("flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400/70",
+                  className={cn("flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/70",
                     filter === id ? "bg-ink-800 text-ink-100" : "text-ink-400 hover:bg-ink-850 hover:text-ink-100")}>
                   {label}
                   <span className="rounded-full bg-ink-950/60 px-1.5 text-[10px] tabular-nums text-ink-300">{count}</span>
@@ -322,7 +322,7 @@ export function ContactImporter({ defaultDdd, guide }: { defaultDdd: string; gui
             <DataTable minWidth={820} align={["left", "left", "left", "left", "left", "left"]} head={[
               <input key="all" type="checkbox" checked={allVisibleSelected} disabled={!selectable.length}
                 onChange={(e) => toggleVisible(e.target.checked)} aria-label="Selecionar todos os contatos listados"
-                className="h-4 w-4 accent-[var(--color-gold-500)] disabled:opacity-40" />,
+                className="h-4 w-4 accent-[var(--color-brand-500)] disabled:opacity-40" />,
               "Nome", "WhatsApp", "Telefone", "E-mail", "Situação",
             ]}>
               {filtered.slice(0, limit).map((r) => {
@@ -334,7 +334,7 @@ export function ContactImporter({ defaultDdd, guide }: { defaultDdd: string; gui
                       {isNew ? (
                         <input type="checkbox" checked={selected.has(r.key) && validName} disabled={!validName}
                           onChange={(e) => toggle(r.key, e.target.checked)} aria-label={`Importar ${r.name || phone(r.whatsapp ?? r.phone)}`}
-                          className="h-4 w-4 accent-[var(--color-gold-500)] disabled:opacity-40" />
+                          className="h-4 w-4 accent-[var(--color-brand-500)] disabled:opacity-40" />
                       ) : null}
                     </td>
                     <td className="min-w-56">
@@ -357,10 +357,10 @@ export function ContactImporter({ defaultDdd, guide }: { defaultDdd: string; gui
                     <td className="whitespace-nowrap">
                       {isNew ? <Badge tone="green" dot>Novo</Badge>
                         : r.status === "existing" && r.existing ? (
-                          <Link href={`/clientes/${r.existing.id}`} target="_blank" className="group inline-flex items-center gap-1.5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-400/70"
+                          <Link href={`/clientes/${r.existing.id}`} target="_blank" className="group inline-flex items-center gap-1.5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/70"
                             title={`Cadastrado como ${r.existing.full_name}`}>
                             <Badge>{r.existing.active ? "Já cadastrado" : "Cadastrado (inativo)"}</Badge>
-                            <span className="text-xs text-ink-500 group-hover:text-gold-300">ver</span>
+                            <span className="text-xs text-ink-500 group-hover:text-brand-300">ver</span>
                           </Link>
                         ) : <Badge tone={r.status === "repeated" ? "amber" : "red"}>{r.reason}</Badge>}
                     </td>
@@ -406,12 +406,12 @@ export function ContactImporter({ defaultDdd, guide }: { defaultDdd: string; gui
       {phase === "importing" ? (
         <Card className="animate-in">
           <CardBody className="flex flex-col items-center py-14 text-center" role="status" aria-live="polite">
-            <Loader2 className="h-8 w-8 animate-spin text-gold-400" aria-hidden />
+            <Loader2 className="h-8 w-8 animate-spin text-brand-400" aria-hidden />
             <p className="mt-4 text-sm font-semibold text-ink-100">Cadastrando clientes…</p>
             <p className="mt-1 text-sm tabular-nums text-ink-400">{progress.done} de {progress.total}</p>
             <div className="mt-5 h-1.5 w-full max-w-sm overflow-hidden rounded-full bg-ink-800"
               role="progressbar" aria-valuemin={0} aria-valuemax={progress.total} aria-valuenow={progress.done} aria-label="Progresso da importação">
-              <div className="h-full origin-left rounded-full bg-gold-500 transition-transform duration-300"
+              <div className="h-full origin-left rounded-full bg-brand-500 transition-transform duration-300"
                 style={{ transform: `scaleX(${progress.total ? progress.done / progress.total : 0})` }} />
             </div>
             <p className="mt-4 text-xs text-ink-500">Não feche esta página até terminar.</p>

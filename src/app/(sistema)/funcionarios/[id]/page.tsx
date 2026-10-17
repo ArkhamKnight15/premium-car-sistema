@@ -33,7 +33,7 @@ export default async function EmployeePage({ params }: { params: Promise<{ id: s
   return (
     <>
       <PageHeader back={{ href: "/funcionarios", label: "Funcionários" }}
-        title={<span className="flex flex-wrap items-center gap-2">{e.full_name}{!e.active ? <Badge>Inativo</Badge> : null}{p ? <Badge tone={p.role === "admin" ? "gold" : "blue"}>{p.role === "admin" ? "Administrador" : "Funcionário"}</Badge> : null}</span>}
+        title={<span className="flex flex-wrap items-center gap-2">{e.full_name}{!e.active ? <Badge>Inativo</Badge> : null}{p ? <Badge tone={p.role === "admin" ? "brand" : "blue"}>{p.role === "admin" ? "Administrador" : "Funcionário"}</Badge> : null}</span>}
         description={e.job_title ?? undefined} />
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="space-y-6">

@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import type { Metadata } from "next";
-import { CalendarClock, Car, Clock, LayoutGrid, List, Plus, UserRound, Wrench } from "lucide-react";
+import { CalendarClock, Car, Clock, LayoutGrid, List, MessageCircle, Plus, UserRound, Wrench } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getEmployees, getServices } from "@/lib/data";
@@ -15,9 +15,10 @@ import { Plate } from "@/components/domain/plate";
 import { QuickStatus } from "@/components/domain/quick-status";
 import { LiveRefresh } from "@/components/layout/realtime";
 import { DOTS } from "@/components/ui/badge";
-import { OPEN_STATUSES, ORDER_STATUS } from "@/lib/constants";
+import { OPEN_STATUSES, ORDER_STATUS, isReady } from "@/lib/constants";
 import { osNumber, shortDateTime, since, time } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { readyMessage, whatsappLink } from "@/lib/whatsapp";
 import type { ItemStatus, OrderStatus } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Veículos na Empresa" };
@@ -25,7 +26,7 @@ export const metadata: Metadata = { title: "Veículos na Empresa" };
 type Row = {
   id: string; number: number; status: OrderStatus; entered_at: string; expected_at: string | null; total: number; amount_paid: number;
   responsible: { full_name: string } | null;
-  customers: { id: string; full_name: string } | null; vehicles: { id: string; plate: string | null; brand: string; model: string } | null;
+  customers: { id: string; full_name: string; whatsapp: string | null; phone: string | null } | null; vehicles: { id: string; plate: string | null; brand: string; model: string } | null;
   service_order_items: { description: string; status: ItemStatus; executor: { full_name: string } | null }[];
   order_photos: { storage_path: string; kind: string; removed_at: string | null }[];
 };
@@ -54,6 +55,11 @@ export default async function InShopPage({ searchParams }: { searchParams: Promi
 
   const counts = OPEN_STATUSES.map((s) => ({ s, n: rows.filter((r) => r.status === s).length }));
   const now = Date.now();
+  /** Link "carro pronto" para o WhatsApp do cliente, só quando o veículo já pode ser retirado. */
+  const readyLink = (o: Row) => {
+    const contact = o.customers?.whatsapp ?? o.customers?.phone;
+    return isReady(o.status) && contact && o.customers && o.vehicles ? whatsappLink(contact, readyMessage(o.customers.full_name, [o.vehicles])) : null;
+  };
   const viewHref = (v: string) => `/na-empresa?${new URLSearchParams({ ...Object.fromEntries(Object.entries(sp).filter(([, x]) => x)), view: v })}`;
 
   return (
@@ -77,7 +83,7 @@ export default async function InShopPage({ searchParams }: { searchParams: Promi
         {counts.map(({ s, n }) => (
           <Link key={s} href={`/na-empresa?${new URLSearchParams({ view, ...(sp.status === s ? {} : { status: s }) })}`}
             className={cn("flex shrink-0 items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition-colors",
-              sp.status === s ? "border-gold-500/50 bg-gold-500/10 text-gold-200" : "border-ink-800 bg-ink-900 text-ink-300 hover:border-ink-600")}>
+              sp.status === s ? "border-brand-500/50 bg-brand-500/10 text-brand-200" : "border-ink-800 bg-ink-900 text-ink-300 hover:border-ink-600")}>
             <span className={cn("h-2 w-2 rounded-full", DOTS[ORDER_STATUS[s].tone])} />
             {ORDER_STATUS[s].label}
             <span className="tabular-nums text-ink-100">{n}</span>
@@ -97,6 +103,7 @@ export default async function InShopPage({ searchParams }: { searchParams: Promi
             const current = o.service_order_items.find((it) => it.status === "in_progress") ?? o.service_order_items.find((it) => it.status === "pending");
             const late = o.expected_at && new Date(o.expected_at).getTime() < now && !["completed", "awaiting_pickup"].includes(o.status);
             const cover = covers[i] ? urlOf.get(covers[i]!) : null;
+            const notify = readyLink(o);
             return (
               <Card key={o.id} className="flex flex-col overflow-hidden">
                 <Link href={`/ordens/${o.id}`} className="group relative block aspect-[16/8] overflow-hidden bg-gradient-to-br from-ink-850 to-ink-925">
@@ -110,10 +117,10 @@ export default async function InShopPage({ searchParams }: { searchParams: Promi
                 <div className="flex flex-1 flex-col p-4">
                   <div className="flex items-start justify-between gap-2">
                     <div className="min-w-0">
-                      <Link href={`/ordens/${o.id}`} className="block truncate font-semibold hover:text-gold-300">{o.vehicles?.brand} {o.vehicles?.model}</Link>
+                      <Link href={`/ordens/${o.id}`} className="block truncate font-semibold hover:text-brand-300">{o.vehicles?.brand} {o.vehicles?.model}</Link>
                       <p className="truncate text-sm text-ink-400">{o.customers?.full_name}</p>
                     </div>
-                    <span className="shrink-0 text-xs font-semibold text-gold-400">{osNumber(o.number)}</span>
+                    <span className="shrink-0 text-xs font-semibold text-brand-400">{osNumber(o.number)}</span>
                   </div>
                   <dl className="mt-3 space-y-1.5 text-xs text-ink-300">
                     <div className="flex items-center gap-2"><Wrench className="h-3.5 w-3.5 shrink-0 text-ink-500" />
@@ -125,7 +132,12 @@ export default async function InShopPage({ searchParams }: { searchParams: Promi
                       {o.expected_at ? `Previsão ${shortDateTime(o.expected_at)}${late ? " · atrasado" : ""}` : "Sem previsão"}
                     </div>
                   </dl>
-                  <div className="mt-auto pt-4">
+                  <div className="mt-auto space-y-2 pt-4">
+                    {notify ? (
+                      <a href={notify} target="_blank" rel="noopener noreferrer" className={buttonClass("outline", "sm", "w-full")}>
+                        <MessageCircle /> Avisar que está pronto
+                      </a>
+                    ) : null}
                     <QuickStatus orderId={o.id} status={o.status} balance={Number(o.total) - Number(o.amount_paid)} compact />
                   </div>
                 </div>
@@ -139,15 +151,27 @@ export default async function InShopPage({ searchParams }: { searchParams: Promi
             {rows.map((o) => {
               const current = o.service_order_items.find((it) => it.status === "in_progress") ?? o.service_order_items.find((it) => it.status === "pending");
               const late = o.expected_at && new Date(o.expected_at).getTime() < now && !["completed", "awaiting_pickup"].includes(o.status);
+              const notify = readyLink(o);
               return (
                 <tr key={o.id}>
                   <td><Link href={`/ordens/${o.id}`}><Plate value={o.vehicles?.plate} size="sm" /></Link></td>
-                  <td><Link href={`/ordens/${o.id}`} className="font-medium hover:text-gold-300">{o.vehicles?.brand} {o.vehicles?.model}</Link><span className="block text-xs text-ink-500">{o.customers?.full_name} · {osNumber(o.number)}</span></td>
+                  <td><Link href={`/ordens/${o.id}`} className="font-medium hover:text-brand-300">{o.vehicles?.brand} {o.vehicles?.model}</Link><span className="block text-xs text-ink-500">{o.customers?.full_name} · {osNumber(o.number)}</span></td>
                   <td className="max-w-[220px] truncate text-ink-300">{current?.description ?? "Concluídos"}</td>
                   <td className="whitespace-nowrap text-ink-300">{shortDateTime(o.entered_at)}</td>
                   <td className="text-ink-300">{o.responsible?.full_name ?? "—"}</td>
                   <td className={cn("whitespace-nowrap", late ? "text-red-300" : "text-ink-300")}>{o.expected_at ? `${shortDateTime(o.expected_at)}` : "—"}{late ? " ⚠" : ""}</td>
-                  <td><OrderStatusBadge status={o.status} short /></td>
+                  <td>
+                    <span className="flex items-center gap-2">
+                      <OrderStatusBadge status={o.status} short />
+                      {notify ? (
+                        <a href={notify} target="_blank" rel="noopener noreferrer" title="Avisar pelo WhatsApp que está pronto"
+                          aria-label={`Avisar ${o.customers?.full_name} pelo WhatsApp que o veículo está pronto`}
+                          className="flex h-7 w-7 items-center justify-center rounded-md border border-brand-500/40 text-brand-300 transition-colors hover:bg-brand-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/70">
+                          <MessageCircle className="h-3.5 w-3.5" aria-hidden />
+                        </a>
+                      ) : null}
+                    </span>
+                  </td>
                 </tr>
               );
             })}

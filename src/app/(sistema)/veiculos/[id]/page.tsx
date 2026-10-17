@@ -79,7 +79,7 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
               <DataTable head={["OS", "Entrada", "Saída", "Serviços", "Valor", "Pagamento", "Status"]} align={["left", "left", "left", "left", "right", "left", "left"]} minWidth={880}>
                 {olist.map((o) => (
                   <tr key={o.id}>
-                    <td><Link href={`/ordens/${o.id}`} className="font-semibold text-gold-300 hover:underline">{osNumber(o.number)}</Link></td>
+                    <td><Link href={`/ordens/${o.id}`} className="font-semibold text-brand-300 hover:underline">{osNumber(o.number)}</Link></td>
                     <td className="whitespace-nowrap text-ink-300">{dateTime(o.entered_at)}</td>
                     <td className="whitespace-nowrap text-ink-300">{o.delivered_at ? dateTime(o.delivered_at) : "—"}</td>
                     <td className="max-w-[260px] text-ink-300">
@@ -136,7 +136,7 @@ export default async function VehiclePage({ params }: { params: Promise<{ id: st
           <Card>
             <CardHeader title="Proprietário" action={editable && !open ? <Link href={`/veiculos/${id}/transferir`} className={buttonClass("ghost", "xs")}><ArrowLeftRight /> Transferir</Link> : null} />
             <CardBody>
-              <Link href={`/clientes/${owner.data?.id}`} className="font-semibold hover:text-gold-300">{owner.data?.full_name}</Link>
+              <Link href={`/clientes/${owner.data?.id}`} className="font-semibold hover:text-brand-300">{owner.data?.full_name}</Link>
               <p className="mt-1 text-sm text-ink-400">{phone(owner.data?.whatsapp ?? owner.data?.phone)}{owner.data?.email ? ` · ${owner.data.email}` : ""}</p>
             </CardBody>
           </Card>

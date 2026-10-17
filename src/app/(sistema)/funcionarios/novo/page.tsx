@@ -23,7 +23,7 @@ export default function NewEmployeePage() {
               <Field name="phone" label="Telefone"><Input id="phone" name="phone" type="tel" /></Field>
             </div>
             <label className="flex items-center gap-2.5 rounded-lg border border-ink-800 p-3 text-sm">
-              <input type="checkbox" name="with_login" checked={withLogin} onChange={(e) => setWithLogin(e.target.checked)} className="h-4 w-4 accent-[var(--color-gold-500)]" />
+              <input type="checkbox" name="with_login" checked={withLogin} onChange={(e) => setWithLogin(e.target.checked)} className="h-4 w-4 accent-[var(--color-brand-500)]" />
               Criar login individual para acessar o sistema
             </label>
             {withLogin ? (

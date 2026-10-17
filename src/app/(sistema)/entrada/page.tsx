@@ -55,8 +55,8 @@ export default async function EntryPage({ searchParams }: { searchParams: Promis
 
       <ol className="mb-6 grid grid-cols-3 gap-2 text-xs font-semibold">
         {["Cliente", "Veículo", "Serviços e estado inicial"].map((label, i) => (
-          <li key={label} className={cn("flex items-center gap-2 rounded-lg border px-3 py-2", step === i + 1 ? "border-gold-500/50 bg-gold-500/5 text-gold-300" : step > i + 1 ? "border-ink-700 text-ink-300" : "border-ink-800 text-ink-500")}>
-            <span className={cn("flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px]", step > i + 1 ? "bg-gold-500 text-ink-950" : "border border-current")}>
+          <li key={label} className={cn("flex items-center gap-2 rounded-lg border px-3 py-2", step === i + 1 ? "border-brand-500/50 bg-brand-500/5 text-brand-300" : step > i + 1 ? "border-ink-700 text-ink-300" : "border-ink-800 text-ink-500")}>
+            <span className={cn("flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px]", step > i + 1 ? "bg-brand-500 text-ink-950" : "border border-current")}>
               {step > i + 1 ? <Check className="h-3 w-3" /> : i + 1}
             </span>
             <span className="truncate">{label}</span>
@@ -102,7 +102,7 @@ export default async function EntryPage({ searchParams }: { searchParams: Promis
                             <Link href={`/ordens/${open.id}`} className="text-xs font-semibold text-amber-200 hover:underline">Já na empresa · {osNumber(open.number)}</Link>
                           </div>
                         ) : (
-                          <Link href={base({ cliente: customer.id, veiculo: v.id })} className="flex items-center justify-between gap-3 rounded-lg border border-ink-800 p-3 transition-colors hover:border-gold-500/50 hover:bg-ink-850">
+                          <Link href={base({ cliente: customer.id, veiculo: v.id })} className="flex items-center justify-between gap-3 rounded-lg border border-ink-800 p-3 transition-colors hover:border-brand-500/50 hover:bg-ink-850">
                             <span className="flex items-center gap-3">
                               <Plate value={v.plate} />
                               <span className="text-sm">
@@ -110,7 +110,7 @@ export default async function EntryPage({ searchParams }: { searchParams: Promis
                                 <span className="block text-xs text-ink-400">{[v.model_year, v.color, VEHICLE_TYPES[v.vehicle_type]].filter(Boolean).join(" · ")}</span>
                               </span>
                             </span>
-                            <span className="text-xs font-semibold text-gold-300">Selecionar →</span>
+                            <span className="text-xs font-semibold text-brand-300">Selecionar →</span>
                           </Link>
                         )}
                       </li>

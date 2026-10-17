@@ -35,7 +35,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
               return (
                 <li key={`${h.kind}-${h.id}`}>
                   <Link href={`${HREF[h.kind]}${h.id}`} className="flex items-center gap-3 px-5 py-3 hover:bg-ink-850/60">
-                    <Icon className="h-4 w-4 text-gold-400" />
+                    <Icon className="h-4 w-4 text-brand-400" />
                     <span className="min-w-0"><span className="block truncate text-sm font-medium">{h.title}</span><span className="block truncate text-xs text-ink-400">{LABEL[h.kind]}{h.subtitle ? ` · ${h.subtitle}` : ""}</span></span>
                   </Link>
                 </li>

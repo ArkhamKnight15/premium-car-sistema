@@ -42,13 +42,13 @@ export default async function TeamPage() {
               const perms = p && p.role === "employee" ? [p.perm_customers && "cadastros", p.perm_all_orders ? "todas as OS" : "OS atribuídas", p.perm_payments && "pagamentos", p.perm_discounts && "descontos"].filter(Boolean).join(" · ") : p ? "Acesso total" : "—";
               return (
                 <tr key={e.id} className={!e.active ? "opacity-60" : ""}>
-                  <td><Link href={`/funcionarios/${e.id}`} className="font-medium hover:text-gold-300">{e.full_name}</Link>{!e.active ? <Badge className="ml-2">Inativo</Badge> : null}</td>
+                  <td><Link href={`/funcionarios/${e.id}`} className="font-medium hover:text-brand-300">{e.full_name}</Link>{!e.active ? <Badge className="ml-2">Inativo</Badge> : null}</td>
                   <td className="text-ink-300">{e.job_title ?? "—"}</td>
                   <td className="text-ink-300">{phone(e.phone)}</td>
                   <td>
                     {p ? (
                       <span className="flex flex-wrap items-center gap-1.5">
-                        <Badge tone={p.role === "admin" ? "gold" : "blue"}>{p.role === "admin" ? "Administrador" : "Funcionário"}</Badge>
+                        <Badge tone={p.role === "admin" ? "brand" : "blue"}>{p.role === "admin" ? "Administrador" : "Funcionário"}</Badge>
                         {!p.active ? <Badge tone="red">Bloqueado</Badge> : null}
                         <span className="block w-full text-xs text-ink-500">{p.email}</span>
                       </span>

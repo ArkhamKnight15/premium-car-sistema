@@ -23,7 +23,7 @@ export function StatusPanel({ orderId, status, balance, isAdmin }: { orderId: st
       </Field>
       {target === "delivered" && balance > 0 ? (
         <label className="flex items-start gap-2 rounded-md border border-amber-400/30 bg-amber-400/5 p-2.5 text-xs text-amber-200">
-          <input type="checkbox" name="allow_balance" className="mt-0.5 accent-[var(--color-gold-500)]" />
+          <input type="checkbox" name="allow_balance" className="mt-0.5 accent-[var(--color-brand-500)]" />
           Confirmo a entrega com saldo pendente de {money(balance)} (fica registrado na OS).
         </label>
       ) : null}

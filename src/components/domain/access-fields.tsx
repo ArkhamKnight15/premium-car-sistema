@@ -27,7 +27,7 @@ export function PermissionFields({ p, showRole = true }: { p?: Partial<Profile>;
           <p className="text-xs text-ink-500">Sempre permitido: registrar entradas, atualizar status, incluir observações e fotos. Financeiro, relatórios, equipe e configurações são exclusivos do administrador.</p>
         </fieldset>
       ) : (
-        <p className="rounded-lg border border-gold-500/20 bg-gold-500/5 p-3 text-xs text-gold-200">Administradores têm acesso a todos os módulos, inclusive financeiro, relatórios, usuários e configurações.</p>
+        <p className="rounded-lg border border-brand-500/20 bg-brand-500/5 p-3 text-xs text-brand-200">Administradores têm acesso a todos os módulos, inclusive financeiro, relatórios, usuários e configurações.</p>
       )}
     </div>
   );

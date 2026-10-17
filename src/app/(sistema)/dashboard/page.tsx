@@ -86,7 +86,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
       <div className="mt-6 grid gap-6 xl:grid-cols-3">
         <Card className="xl:col-span-2">
-          <CardHeader title="Últimas ordens de serviço" action={<Link href="/ordens" className="text-xs font-semibold text-gold-300">Ver todas</Link>} />
+          <CardHeader title="Últimas ordens de serviço" action={<Link href="/ordens" className="text-xs font-semibold text-brand-300">Ver todas</Link>} />
           {(lastOrders.data ?? []).length === 0 ? (
             <EmptyState icon={ClipboardList} title="Nenhuma OS ainda" action={<Link href="/entrada" className={buttonClass("outline", "sm")}>Registrar a primeira entrada</Link>} />
           ) : (
@@ -94,7 +94,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
               {((lastOrders.data ?? []) as unknown as { id: string; number: number; status: OrderStatus; entered_at: string; total: number; customers: { full_name: string } | null; vehicles: { plate: string | null; brand: string; model: string } | null }[]).map((o) => (
                 <li key={o.id}>
                   <Link href={`/ordens/${o.id}`} className="flex flex-wrap items-center gap-3 px-5 py-3 transition-colors hover:bg-ink-850/60 sm:flex-nowrap">
-                    <span className="w-20 shrink-0 text-xs font-semibold text-gold-300">{osNumber(o.number)}</span>
+                    <span className="w-20 shrink-0 text-xs font-semibold text-brand-300">{osNumber(o.number)}</span>
                     <Plate value={o.vehicles?.plate} size="sm" />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm">{o.vehicles?.brand} {o.vehicles?.model}</span>
@@ -110,7 +110,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         </Card>
 
         <Card>
-          <CardHeader title="Próximos compromissos" action={<Link href="/agenda" className="text-xs font-semibold text-gold-300">Agenda</Link>} />
+          <CardHeader title="Próximos compromissos" action={<Link href="/agenda" className="text-xs font-semibold text-brand-300">Agenda</Link>} />
           {(nextAppts.data ?? []).length === 0 ? (
             <EmptyState icon={CalendarDays} title="Agenda livre" description="Nenhum compromisso futuro." action={<Link href="/agenda/novo" className={buttonClass("outline", "sm")}>Agendar</Link>} />
           ) : (
@@ -119,7 +119,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                 <li key={a.id}>
                   <Link href={`/agenda/${a.id}`} className="block px-5 py-3 transition-colors hover:bg-ink-850/60">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-semibold tabular-nums text-gold-300">{date(a.starts_at).slice(0, 5)} · {time(a.starts_at)}</span>
+                      <span className="text-sm font-semibold tabular-nums text-brand-300">{date(a.starts_at).slice(0, 5)} · {time(a.starts_at)}</span>
                       <AppointmentBadge status={a.status} />
                     </div>
                     <p className="mt-1 truncate text-sm">{a.customers?.full_name} <span className="text-ink-400">· {a.vehicles?.model} {a.vehicles?.plate ?? ""}</span></p>
@@ -132,7 +132,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         </Card>
 
         <Card className="xl:col-span-3">
-          <CardHeader title="Últimos clientes cadastrados" action={<Link href="/clientes?ordem=recentes" className="text-xs font-semibold text-gold-300">Ver clientes</Link>} />
+          <CardHeader title="Últimos clientes cadastrados" action={<Link href="/clientes?ordem=recentes" className="text-xs font-semibold text-brand-300">Ver clientes</Link>} />
           {(lastCustomers.data ?? []).length === 0 ? (
             <EmptyState icon={Users} title="Nenhum cliente cadastrado" />
           ) : (

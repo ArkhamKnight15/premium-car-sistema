@@ -174,7 +174,7 @@ export function EntryForm({ services, employees, canDiscount, defaults }: { serv
               <Input name="discount" value={orderDiscount} onChange={(e) => setOrderDiscount(e.target.value)} inputMode="decimal" className="h-8 w-28 text-right" />
             </label>
           ) : null}
-          <span className="text-base font-semibold">Total <span className="tabular-nums text-gold-300">{money(total)}</span></span>
+          <span className="text-base font-semibold">Total <span className="tabular-nums text-brand-300">{money(total)}</span></span>
         </div>
       </section>
 
@@ -210,8 +210,8 @@ export function EntryForm({ services, employees, canDiscount, defaults }: { serv
         </Field>
         <div className="sm:col-span-6">
           <Label htmlFor="photos">Fotos de entrada</Label>
-          <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-ink-700 bg-ink-925 px-4 py-4 text-sm text-ink-300 hover:border-gold-500/50">
-            <Camera className="h-5 w-5 text-gold-400" />
+          <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-ink-700 bg-ink-925 px-4 py-4 text-sm text-ink-300 hover:border-brand-500/50">
+            <Camera className="h-5 w-5 text-brand-400" />
             <span>{photos.length ? `${photos.length} foto(s) — toque para adicionar mais` : "Tirar ou escolher fotos"}</span>
             {/* sem "name": as fotos não vão no formulário, e sim direto ao Storage */}
             <input id="photos" type="file" accept="image/*" multiple capture="environment" className="sr-only"
@@ -235,7 +235,7 @@ export function EntryForm({ services, employees, canDiscount, defaults }: { serv
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink-800 pt-5">
         <p className="text-xs text-ink-500">A data e hora de entrada e o seu usuário são registrados automaticamente.</p>
-        {uploading ? <p className="text-sm text-gold-300" role="status">{uploading}</p> : null}
+        {uploading ? <p className="text-sm text-brand-300" role="status">{uploading}</p> : null}
         <SubmitButton size="lg" disabled={rows.length === 0 || !!uploading} pendingText="Abrindo OS…">
           <Plus /> Registrar entrada e abrir OS
         </SubmitButton>

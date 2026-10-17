@@ -5,9 +5,10 @@ import { ChevronLeft } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { getEmployees, getSettings } from "@/lib/data";
-import { ORDER_STATUS, PAYMENT_STATUS } from "@/lib/constants";
+import { ORDER_STATUS, PAYMENT_STATUS, isReady } from "@/lib/constants";
 import { dateTime, doc, km, money, osNumber, phone, plate } from "@/lib/format";
 import type { Customer, OrderItem, ServiceOrder, Vehicle } from "@/lib/types";
+import { BrandLogo } from "@/components/layout/logo";
 import { PrintButton } from "./print-button";
 
 export const metadata: Metadata = { title: "Imprimir OS" };
@@ -26,6 +27,8 @@ export default async function PrintOrderPage({ params }: { params: Promise<{ id:
     supabase.from("service_order_items").select("*").eq("order_id", id).order("created_at"),
   ]);
   const responsible = employees.find((e) => e.id === o.responsible_id)?.full_name;
+  // Veículo pronto: o horário é o momento em que a OS é gerada para envio ao cliente
+  const readyAt = isReady(o.status) ? new Date() : null;
   const s = settings;
 
   return (
@@ -37,7 +40,7 @@ export default async function PrintOrderPage({ params }: { params: Promise<{ id:
       <article className="print-sheet mx-auto max-w-3xl rounded-lg bg-white p-8 text-[12.5px] leading-relaxed text-neutral-900 print:max-w-none print:rounded-none">
         <header className="flex items-start justify-between gap-6 border-b-2 border-neutral-900 pb-4">
           <div>
-            <p className="font-display text-lg tracking-[0.22em]">PREMIUM CAR</p>
+            <BrandLogo className="mb-3 w-52 text-neutral-900" />
             <p className="text-neutral-600">{[s?.legal_name, s?.cnpj && `CNPJ ${doc(s.cnpj)}`].filter(Boolean).join(" · ")}</p>
             <p className="text-neutral-600">{[s?.address, s?.city].filter(Boolean).join(" — ")}</p>
             <p className="text-neutral-600">{[s?.phone && phone(s.phone), s?.whatsapp && `WhatsApp ${phone(s.whatsapp)}`, s?.email].filter(Boolean).join(" · ")}</p>
@@ -64,9 +67,10 @@ export default async function PrintOrderPage({ params }: { params: Promise<{ id:
           </div>
         </section>
 
-        <section className="grid grid-cols-3 gap-4 border-b border-neutral-300 py-3">
+        <section className={`grid gap-4 border-b border-neutral-300 py-3 ${readyAt ? "grid-cols-4" : "grid-cols-3"}`}>
           <p><span className="block text-[10px] font-semibold uppercase tracking-widest text-neutral-500">Entrada</span>{dateTime(o.entered_at)}</p>
           <p><span className="block text-[10px] font-semibold uppercase tracking-widest text-neutral-500">Previsão</span>{dateTime(o.expected_at)}</p>
+          {readyAt ? <p className="font-semibold"><span className="block text-[10px] font-semibold uppercase tracking-widest text-brand-600">Pronto para retirada</span>{dateTime(readyAt)}</p> : null}
           <p><span className="block text-[10px] font-semibold uppercase tracking-widest text-neutral-500">Responsável</span>{responsible ?? "—"}</p>
         </section>
 
