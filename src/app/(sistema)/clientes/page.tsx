@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Copy, Search, UserPlus, Users } from "lucide-react";
+import { Copy, Search, Upload, UserPlus, Users } from "lucide-react";
 import { can, requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Card } from "@/components/ui/card";
@@ -55,6 +55,7 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
         actions={
           <>
             <Link href="/clientes/duplicados" className={buttonClass("ghost")}><Copy /> Possíveis duplicados</Link>
+            {can(profile, "customers") ? <Link href="/clientes/importar" className={buttonClass("secondary")}><Upload /> Importar contatos</Link> : null}
             {can(profile, "customers") ? <Link href="/clientes/novo" className={buttonClass("primary")}><UserPlus /> Novo cliente</Link> : null}
           </>
         }
@@ -78,8 +79,13 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
         </form>
         {rows.length === 0 ? (
           <EmptyState icon={Users} title={term ? "Nenhum cliente encontrado" : "Nenhum cliente cadastrado"}
-            description={term ? "Confira a grafia ou pesquise por telefone ou CPF." : "Cadastre o primeiro cliente para começar."}
-            action={can(profile, "customers") ? <Link href="/clientes/novo" className={buttonClass("outline", "sm")}>Cadastrar cliente</Link> : null} />
+            description={term ? "Confira a grafia ou pesquise por telefone ou CPF." : "Cadastre o primeiro cliente ou traga de uma vez os contatos da agenda do WhatsApp."}
+            action={can(profile, "customers") ? (
+              <div className="flex flex-wrap justify-center gap-2">
+                {!term ? <Link href="/clientes/importar" className={buttonClass("outline", "sm")}><Upload /> Importar contatos</Link> : null}
+                <Link href="/clientes/novo" className={buttonClass(term ? "outline" : "ghost", "sm")}>Cadastrar cliente</Link>
+              </div>
+            ) : null} />
         ) : (
           <DataTable head={["Cliente", "CPF/CNPJ", "Contato", "Veículos", "Atendimentos", "Cadastro", ""]} align={["left", "left", "left", "center", "center", "left", "right"]}>
             {rows.map((c) => (

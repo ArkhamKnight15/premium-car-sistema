@@ -44,7 +44,10 @@ export function AppShell({ children, isAdmin, userName, inShop }: { children: Re
       </aside>
 
       {/* Barra superior */}
-      <header className="no-print sticky top-0 z-20 border-b border-ink-800 bg-ink-950/85 backdrop-blur-xl">
+      <header className="no-print sticky top-0 z-20 border-b border-ink-800">
+        {/* O desfoque fica numa camada à parte: backdrop-filter no próprio header prenderia
+            os elementos fixed do MobileNav (barra inferior, menu e busca) dentro dele. */}
+        <div className="absolute inset-0 -z-10 bg-ink-950/85 backdrop-blur-xl" aria-hidden />
         <div className="flex h-14 items-center gap-3 px-4 sm:px-6 lg:h-16">
           <div className="lg:hidden"><Logo compact /></div>
           <GlobalSearch className="hidden max-w-md flex-1 lg:block" />
