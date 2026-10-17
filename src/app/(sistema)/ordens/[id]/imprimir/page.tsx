@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -12,6 +13,18 @@ import { BrandLogo } from "@/components/layout/logo";
 import { PrintButton } from "./print-button";
 
 export const metadata: Metadata = { title: "Imprimir OS" };
+
+const LABEL_BASE = "text-[10px] font-semibold uppercase tracking-widest";
+const LABEL = `${LABEL_BASE} text-neutral-500`;
+const GRID_COLS = ["", "grid-cols-1", "grid-cols-2", "grid-cols-3", "grid-cols-4"];
+
+/** Junta só as partes preenchidas; null quando não sobra nada. */
+const filled = (parts: (string | number | null | undefined | false)[], sep = " · ") => parts.filter(Boolean).join(sep) || null;
+
+/** Linha que só aparece quando tem conteúdo: dados vazios não vão para a OS. */
+function Line({ children, className }: { children: ReactNode; className?: string }) {
+  return children ? <p className={className}>{children}</p> : null;
+}
 
 export default async function PrintOrderPage({ params }: { params: Promise<{ id: string }> }) {
   await requireUser();
@@ -30,6 +43,18 @@ export default async function PrintOrderPage({ params }: { params: Promise<{ id:
   // Veículo pronto: o horário é o momento em que a OS é gerada para envio ao cliente
   const readyAt = isReady(o.status) ? new Date() : null;
   const s = settings;
+  const cust = c.data;
+  const veh = v.data;
+  const itemRows = (items.data ?? []) as OrderItem[];
+  const hasItemDiscount = itemRows.some((it) => Number(it.discount));
+  const years = veh?.manufacture_year && veh?.model_year ? `${veh.manufacture_year}/${veh.model_year}` : veh?.manufacture_year ?? veh?.model_year;
+  const contact = cust?.whatsapp ?? cust?.phone;
+  const dates = [
+    { label: "Entrada", value: dateTime(o.entered_at) },
+    o.expected_at ? { label: "Previsão", value: dateTime(o.expected_at) } : null,
+    readyAt ? { label: "Pronto para retirada", value: dateTime(readyAt), highlight: true } : null,
+    responsible ? { label: "Responsável", value: responsible } : null,
+  ].filter((d) => d !== null);
 
   return (
     <div>
@@ -41,12 +66,12 @@ export default async function PrintOrderPage({ params }: { params: Promise<{ id:
         <header className="flex items-start justify-between gap-6 border-b-2 border-neutral-900 pb-4">
           <div>
             <BrandLogo className="mb-3 w-52 text-neutral-900" />
-            <p className="text-neutral-600">{[s?.legal_name, s?.cnpj && `CNPJ ${doc(s.cnpj)}`].filter(Boolean).join(" · ")}</p>
-            <p className="text-neutral-600">{[s?.address, s?.city].filter(Boolean).join(" — ")}</p>
-            <p className="text-neutral-600">{[s?.phone && phone(s.phone), s?.whatsapp && `WhatsApp ${phone(s.whatsapp)}`, s?.email].filter(Boolean).join(" · ")}</p>
+            <Line className="text-neutral-600">{filled([s?.legal_name, s?.cnpj && `CNPJ ${doc(s.cnpj)}`])}</Line>
+            <Line className="text-neutral-600">{filled([s?.address, s?.city], " — ")}</Line>
+            <Line className="text-neutral-600">{filled([s?.phone && phone(s.phone), s?.whatsapp && `WhatsApp ${phone(s.whatsapp)}`, s?.email])}</Line>
           </div>
           <div className="text-right">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">Ordem de serviço</p>
+            <p className={LABEL}>Ordem de serviço</p>
             <p className="text-2xl font-bold">{osNumber(o.number)}</p>
             <p>Status: {ORDER_STATUS[o.status].label}</p>
           </div>
@@ -54,47 +79,49 @@ export default async function PrintOrderPage({ params }: { params: Promise<{ id:
 
         <section className="grid grid-cols-2 gap-6 border-b border-neutral-300 py-4">
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">Cliente</p>
-            <p className="font-semibold">{c.data?.full_name}</p>
-            <p>{[c.data?.document && doc(c.data.document), phone(c.data?.whatsapp ?? c.data?.phone)].filter(Boolean).join(" · ")}</p>
-            <p>{c.data?.email}</p>
+            <p className={LABEL}>Cliente</p>
+            <p className="font-semibold">{cust?.full_name}</p>
+            <Line>{filled([cust?.document && doc(cust.document), contact && phone(contact)])}</Line>
+            <Line>{cust?.email}</Line>
           </div>
           <div>
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">Veículo</p>
-            <p className="font-semibold">{v.data?.brand} {v.data?.model} · {plate(v.data?.plate)}</p>
-            <p>{[v.data?.manufacture_year && v.data?.model_year ? `${v.data.manufacture_year}/${v.data.model_year}` : null, v.data?.color].filter(Boolean).join(" · ")}</p>
-            <p>Km: {km(o.mileage_km)} · Combustível: {o.fuel_level ?? "—"}</p>
+            <p className={LABEL}>Veículo</p>
+            <p className="font-semibold">{filled([`${veh?.brand ?? ""} ${veh?.model ?? ""}`.trim(), veh?.plate && plate(veh.plate)])}</p>
+            <Line>{filled([years, veh?.color])}</Line>
+            <Line>{filled([o.mileage_km != null && km(o.mileage_km), o.fuel_level && `Combustível: ${o.fuel_level}`])}</Line>
           </div>
         </section>
 
-        <section className={`grid gap-4 border-b border-neutral-300 py-3 ${readyAt ? "grid-cols-4" : "grid-cols-3"}`}>
-          <p><span className="block text-[10px] font-semibold uppercase tracking-widest text-neutral-500">Entrada</span>{dateTime(o.entered_at)}</p>
-          <p><span className="block text-[10px] font-semibold uppercase tracking-widest text-neutral-500">Previsão</span>{dateTime(o.expected_at)}</p>
-          {readyAt ? <p className="font-semibold"><span className="block text-[10px] font-semibold uppercase tracking-widest text-brand-600">Pronto para retirada</span>{dateTime(readyAt)}</p> : null}
-          <p><span className="block text-[10px] font-semibold uppercase tracking-widest text-neutral-500">Responsável</span>{responsible ?? "—"}</p>
+        <section className={`grid gap-4 border-b border-neutral-300 py-3 ${GRID_COLS[dates.length]}`}>
+          {dates.map((d) => (
+            <p key={d.label} className={d.highlight ? "font-semibold" : undefined}>
+              <span className={`block ${LABEL_BASE} ${d.highlight ? "text-brand-600" : "text-neutral-500"}`}>{d.label}</span>{d.value}
+            </p>
+          ))}
         </section>
 
-        <section className="border-b border-neutral-300 py-3">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">Estado inicial do veículo</p>
-          <p>{o.initial_condition ?? "Não registrado."}</p>
-          <p className="mt-2 text-[10px] font-semibold uppercase tracking-widest text-neutral-500">Avarias preexistentes</p>
-          <p>{o.damages ?? "Nenhuma registrada."}</p>
-        </section>
+        {o.initial_condition || o.damages ? (
+          <section className="space-y-2 border-b border-neutral-300 py-3">
+            {o.initial_condition ? <div><p className={LABEL}>Estado inicial do veículo</p><p className="whitespace-pre-line">{o.initial_condition}</p></div> : null}
+            {o.damages ? <div><p className={LABEL}>Avarias preexistentes</p><p className="whitespace-pre-line">{o.damages}</p></div> : null}
+          </section>
+        ) : null}
 
         <section className="py-4">
           <table className="w-full">
             <thead>
               <tr className="border-b border-neutral-400 text-left text-[10px] uppercase tracking-widest text-neutral-500">
-                <th className="py-1.5">Serviço</th><th className="py-1.5 text-right">Qtd.</th><th className="py-1.5 text-right">Valor</th><th className="py-1.5 text-right">Desconto</th><th className="py-1.5 text-right">Total</th>
+                <th className="py-1.5">Serviço</th><th className="py-1.5 text-right">Qtd.</th><th className="py-1.5 text-right">Valor</th>
+                {hasItemDiscount ? <th className="py-1.5 text-right">Desconto</th> : null}<th className="py-1.5 text-right">Total</th>
               </tr>
             </thead>
             <tbody>
-              {((items.data ?? []) as OrderItem[]).map((it) => (
+              {itemRows.map((it) => (
                 <tr key={it.id} className="border-b border-neutral-200">
                   <td className="py-1.5">{it.description}</td>
                   <td className="py-1.5 text-right">{String(it.quantity).replace(".", ",")}</td>
                   <td className="py-1.5 text-right">{money(it.unit_price)}</td>
-                  <td className="py-1.5 text-right">{Number(it.discount) ? money(it.discount) : "—"}</td>
+                  {hasItemDiscount ? <td className="py-1.5 text-right">{Number(it.discount) ? money(it.discount) : ""}</td> : null}
                   <td className="py-1.5 text-right">{money(it.line_total)}</td>
                 </tr>
               ))}
@@ -110,7 +137,7 @@ export default async function PrintOrderPage({ params }: { params: Promise<{ id:
           </div>
         </section>
 
-        {o.notes ? <section className="border-t border-neutral-300 py-3"><p className="text-[10px] font-semibold uppercase tracking-widest text-neutral-500">Observações</p><p>{o.notes}</p></section> : null}
+        {o.notes ? <section className="border-t border-neutral-300 py-3"><p className={LABEL}>Observações</p><p className="whitespace-pre-line">{o.notes}</p></section> : null}
         {s?.order_terms ? <section className="border-t border-neutral-300 py-3 text-[11px] text-neutral-600"><p className="whitespace-pre-line">{s.order_terms}</p></section> : null}
 
         <section className="mt-10 grid grid-cols-2 gap-12">
