@@ -53,7 +53,11 @@ input[type="time"]::-webkit-calendar-picker-indicator { filter: invert(0.75); cu
 }
 
 @media print {
+  /* Sem margem de página o navegador não imprime cabeçalho e rodapé (data, título e o endereço do sistema).
+     A margem fica na própria folha (.print-sheet) e se repete em cada página. */
+  @page { size: A4; margin: 0; }
   body { background: #fff !important; color: #111 !important; }
   .no-print { display: none !important; }
   .print-plain { padding: 0 !important; margin: 0 !important; max-width: none !important; }
+  .print-sheet { padding: 12mm 14mm !important; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 }

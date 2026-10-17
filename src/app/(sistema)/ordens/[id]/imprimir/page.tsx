@@ -34,7 +34,7 @@ export default async function PrintOrderPage({ params }: { params: Promise<{ id:
         <Link href={`/ordens/${id}`} className="inline-flex items-center gap-1 text-sm text-ink-400 hover:text-ink-100"><ChevronLeft className="h-4 w-4" /> Voltar à OS</Link>
         <PrintButton />
       </div>
-      <article className="mx-auto max-w-3xl rounded-lg bg-white p-8 text-[12.5px] leading-relaxed text-neutral-900 print:max-w-none print:rounded-none print:p-0">
+      <article className="print-sheet mx-auto max-w-3xl rounded-lg bg-white p-8 text-[12.5px] leading-relaxed text-neutral-900 print:max-w-none print:rounded-none">
         <header className="flex items-start justify-between gap-6 border-b-2 border-neutral-900 pb-4">
           <div>
             <p className="font-display text-lg tracking-[0.22em]">PREMIUM CAR</p>
