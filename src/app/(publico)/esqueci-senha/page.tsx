@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Recuperar senha" };
 
 export default function ForgotPage() {
   return (
-    <AuthShell title="Recuperar senha" subtitle="Enviaremos um link para você criar uma nova senha." footer={<Link href="/login" className="text-gold-300">Voltar ao login</Link>}>
+    <AuthShell title="Recuperar senha" subtitle="Enviaremos um link para você criar uma nova senha." footer={<Link href="/login" className="text-brand-300">Voltar ao login</Link>}>
       <ActionForm action={requestPasswordReset} className="space-y-4" messageOnTop reset>
         <Field name="email" label="E-mail">
           <Input id="email" name="email" type="email" autoComplete="username" required autoFocus />

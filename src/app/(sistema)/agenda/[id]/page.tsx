@@ -16,6 +16,7 @@ import { AppointmentBadge } from "@/components/domain/badges";
 import { Plate } from "@/components/domain/plate";
 import { CHANNELS } from "@/lib/constants";
 import { dateTime, longDate, minutes, money, osNumber, phone, time, toLocalInput } from "@/lib/format";
+import { whatsappLink } from "@/lib/whatsapp";
 import type { Appointment, Customer, Vehicle } from "@/lib/types";
 import { rescheduleAppointment, setAppointmentStatus, updateAppointmentNotes } from "@/actions/agenda";
 
@@ -38,7 +39,7 @@ export default async function AppointmentPage({ params }: { params: Promise<{ id
   const durationMin = Math.round((new Date(a.ends_at).getTime() - new Date(a.starts_at).getTime()) / 60000);
   const employee = employees.find((e) => e.id === a.employee_id);
   const wa = c.data?.whatsapp ?? c.data?.phone;
-  const waText = encodeURIComponent(`Olá, ${c.data?.full_name.split(" ")[0]}! Confirmando seu horário na Premium Car: ${longDate(a.starts_at)} às ${time(a.starts_at)} (${v.data?.brand} ${v.data?.model}).`);
+  const waText = `Olá, ${c.data?.full_name.split(" ")[0]}! Confirmando seu horário na Premium Car: ${longDate(a.starts_at)} às ${time(a.starts_at)} (${v.data?.brand} ${v.data?.model}).`;
 
   return (
     <>
@@ -47,7 +48,7 @@ export default async function AppointmentPage({ params }: { params: Promise<{ id
         description={`Até ${time(a.ends_at)} (${minutes(durationMin)}) · agendado por ${CHANNELS[a.channel]}`}
         actions={
           <>
-            {wa ? <a href={`https://wa.me/55${wa}?text=${waText}`} target="_blank" rel="noopener noreferrer" className={buttonClass("ghost")}><MessageCircle /> WhatsApp</a> : null}
+            {wa ? <a href={whatsappLink(wa, waText)} target="_blank" rel="noopener noreferrer" className={buttonClass("ghost")}><MessageCircle /> WhatsApp</a> : null}
             {order.data ? <Link href={`/ordens/${order.data.id}`} className={buttonClass("primary")}><ClipboardList /> Ver {osNumber(order.data.number)}</Link>
               : active ? <Link href={`/entrada?agendamento=${id}`} className={buttonClass("primary")}><ClipboardList /> Veículo chegou: abrir OS</Link> : null}
           </>
@@ -61,7 +62,7 @@ export default async function AppointmentPage({ params }: { params: Promise<{ id
             <CardHeader title="Cliente e veículo" />
             <CardBody className="space-y-4">
               <div>
-                <Link href={`/clientes/${c.data?.id}`} className="font-semibold hover:text-gold-300">{c.data?.full_name}</Link>
+                <Link href={`/clientes/${c.data?.id}`} className="font-semibold hover:text-brand-300">{c.data?.full_name}</Link>
                 <p className="text-sm text-ink-400">{phone(wa)}{c.data?.email ? ` · ${c.data.email}` : ""}</p>
               </div>
               <Link href={`/veiculos/${v.data?.id}`} className="inline-flex items-center gap-3 rounded-lg border border-ink-800 p-3 hover:border-ink-600">

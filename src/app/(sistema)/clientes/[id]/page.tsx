@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { CalendarPlus, Car, ClipboardList, Download, Pencil, Plus, ShieldAlert, UserCheck, UserX } from "lucide-react";
+import { CalendarPlus, Car, ClipboardList, Download, MessageCircle, Pencil, Plus, ShieldAlert, UserCheck, UserX } from "lucide-react";
 import { can, requireUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
@@ -11,10 +11,11 @@ import { Alert, DataTable, EmptyState, InfoList, PageHeader } from "@/components
 import { ConfirmAction } from "@/components/forms/confirm-action";
 import { AppointmentBadge, OrderStatusBadge, PaymentBadge } from "@/components/domain/badges";
 import { Plate } from "@/components/domain/plate";
-import { VEHICLE_TYPES } from "@/lib/constants";
+import { VEHICLE_TYPES, isReady } from "@/lib/constants";
 import { cep, date, dateTime, doc, money, osNumber, phone } from "@/lib/format";
 import type { AppointmentStatus, Customer, OrderStatus, PaymentStatus, Vehicle } from "@/lib/types";
 import { anonymizeCustomer, setCustomerActive } from "@/actions/customers";
+import { readyMessage, whatsappLink } from "@/lib/whatsapp";
 
 export const metadata: Metadata = { title: "Cliente" };
 
@@ -45,6 +46,10 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
   const totalSpent = valid.reduce((a, o) => a + Number(o.amount_paid), 0);
   const balance = valid.reduce((a, o) => a + Math.max(Number(o.total) - Number(o.amount_paid), 0), 0);
   const canEdit = can(profile, "customers") && !c.anonymized_at;
+  // Veículos prontos para retirada: o WhatsApp já abre com o aviso
+  const readyVehicles = olist.filter((o) => isReady(o.status) && o.vehicles).map((o) => o.vehicles!);
+  const contact = c.whatsapp ?? c.phone;
+  const readyLink = contact && readyVehicles.length ? whatsappLink(contact, readyMessage(c.full_name, readyVehicles)) : null;
   const address = [c.street && `${c.street}${c.number ? `, ${c.number}` : ""}`, c.complement, c.district, c.city && `${c.city}${c.state ? `/${c.state}` : ""}`, c.zip_code && `CEP ${cep(c.zip_code)}`].filter(Boolean).join(" · ");
 
   return (
@@ -55,6 +60,11 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
         description={`${c.person_type === "PF" ? "Pessoa física" : "Pessoa jurídica"} · cliente desde ${date(c.created_at)}`}
         actions={c.active ? (
           <>
+            {readyLink ? (
+              <a href={readyLink} target="_blank" rel="noopener noreferrer" className={buttonClass("outline")}>
+                <MessageCircle /> Avisar que {readyVehicles.length > 1 ? "estão prontos" : "está pronto"}
+              </a>
+            ) : null}
             {canEdit ? <Link href={`/clientes/${id}/editar`} className={buttonClass("secondary")}><Pencil /> Editar</Link> : null}
             <Link href={`/agenda/novo?cliente=${id}`} className={buttonClass("secondary")}><CalendarPlus /> Agendar</Link>
             <Link href={`/entrada?cliente=${id}`} className={buttonClass("primary")}><Plus /> Entrada de veículo</Link>
@@ -83,7 +93,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
               <DataTable head={["OS", "Veículo", "Serviços", "Entrada", "Total", "Pagamento", "Status"]} align={["left", "left", "left", "left", "right", "left", "left"]} minWidth={860}>
                 {olist.map((o) => (
                   <tr key={o.id}>
-                    <td><Link href={`/ordens/${o.id}`} className="font-semibold text-gold-300 hover:underline">{osNumber(o.number)}</Link></td>
+                    <td><Link href={`/ordens/${o.id}`} className="font-semibold text-brand-300 hover:underline">{osNumber(o.number)}</Link></td>
                     <td className="whitespace-nowrap">{o.vehicles?.brand} {o.vehicles?.model}<span className="block text-xs text-ink-500">{o.vehicles?.plate ?? "sem placa"}</span></td>
                     <td className="max-w-[240px] truncate text-ink-300">{o.service_order_items.map((i) => i.description).join(", ")}</td>
                     <td className="whitespace-nowrap text-ink-300">{date(o.entered_at)}</td>
@@ -127,7 +137,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
               <InfoList cols={1} items={[
                 [c.person_type === "PF" ? "CPF" : "CNPJ", c.document ? doc(c.document) : null],
                 ["Telefone", c.phone ? phone(c.phone) : null],
-                ["WhatsApp", c.whatsapp ? <a href={`https://wa.me/55${c.whatsapp}`} target="_blank" rel="noopener noreferrer" className="text-gold-300 hover:underline">{phone(c.whatsapp)}</a> : null],
+                ["WhatsApp", c.whatsapp ? <a href={whatsappLink(c.whatsapp, readyVehicles.length ? readyMessage(c.full_name, readyVehicles) : undefined)} target="_blank" rel="noopener noreferrer" className="text-brand-300 hover:underline">{phone(c.whatsapp)}</a> : null],
                 ["E-mail", c.email],
                 ["Endereço", address || null],
                 ["Observações internas", c.notes ? <span className="whitespace-pre-line">{c.notes}</span> : null],
@@ -183,7 +193,7 @@ function MiniStat({ label, value, highlight }: { label: string; value: React.Rea
   return (
     <div className="rounded-xl border border-ink-800 bg-ink-900 px-4 py-3">
       <p className="text-[11px] font-semibold uppercase tracking-wider text-ink-500">{label}</p>
-      <p className={`mt-1 text-lg font-semibold tabular-nums ${highlight ? "text-gold-300" : ""}`}>{value}</p>
+      <p className={`mt-1 text-lg font-semibold tabular-nums ${highlight ? "text-brand-300" : ""}`}>{value}</p>
     </div>
   );
 }

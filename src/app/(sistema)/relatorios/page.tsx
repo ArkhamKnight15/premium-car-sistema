@@ -75,7 +75,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
               ) : null}
               {vehicleNotFound ? <Alert tone="warn">Nenhum veículo com a placa {sp.placa}.</Alert> : null}
               {type === "cliente" && !chosen ? <CustomerPicker basePath="/relatorios" q={sp.q} canCreate={false} keep={{ tipo: "cliente" }} /> : null}
-              {type === "cliente" && chosen ? <p className="text-sm">Cliente: <strong>{chosen.full_name}</strong> · <Link href="/relatorios?tipo=cliente" className="text-gold-300">trocar</Link></p> : null}
+              {type === "cliente" && chosen ? <p className="text-sm">Cliente: <strong>{chosen.full_name}</strong> · <Link href="/relatorios?tipo=cliente" className="text-brand-300">trocar</Link></p> : null}
               {report.note ? <p className="text-xs text-ink-500">{report.note}</p> : null}
             </CardBody>
           </Card>
@@ -91,7 +91,7 @@ export default async function ReportsPage({ searchParams }: { searchParams: Prom
                       <tr key={i}>
                         {row.map((cell, j) => (
                           <td key={j} className={cn(report.align?.[j] === "right" && "text-right tabular-nums", "whitespace-nowrap")}>
-                            {j === 0 && report.links?.[i] ? <Link href={report.links[i]!} className="font-medium text-gold-300 hover:underline">{fmt(cell, report.headers[j])}</Link> : fmt(cell, report.headers[j])}
+                            {j === 0 && report.links?.[i] ? <Link href={report.links[i]!} className="font-medium text-brand-300 hover:underline">{fmt(cell, report.headers[j])}</Link> : fmt(cell, report.headers[j])}
                           </td>
                         ))}
                       </tr>

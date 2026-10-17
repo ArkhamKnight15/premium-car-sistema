@@ -34,10 +34,10 @@ export function SidebarLinks({ items, badges }: { items: NavItem[]; badges?: Par
                   <Link href={item.href} aria-current={active ? "page" : undefined}
                     className={cn("group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
                       active ? "bg-ink-800 text-ink-100" : "text-ink-400 hover:bg-ink-850 hover:text-ink-100")}>
-                    {active ? <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-gold-400" aria-hidden /> : null}
-                    <Icon className={cn("h-4 w-4 shrink-0", active ? "text-gold-400" : "text-ink-500 group-hover:text-ink-300")} aria-hidden />
+                    {active ? <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-brand-400" aria-hidden /> : null}
+                    <Icon className={cn("h-4 w-4 shrink-0", active ? "text-brand-400" : "text-ink-500 group-hover:text-ink-300")} aria-hidden />
                     <span className="truncate">{item.label}</span>
-                    {badge ? <span className="ml-auto rounded-full bg-gold-500/15 px-1.5 text-[10px] font-semibold tabular-nums text-gold-300">{badge}</span> : null}
+                    {badge ? <span className="ml-auto rounded-full bg-brand-500/15 px-1.5 text-[10px] font-semibold tabular-nums text-brand-300">{badge}</span> : null}
                   </Link>
                 </li>
               );

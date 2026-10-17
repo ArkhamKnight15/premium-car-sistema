@@ -29,8 +29,8 @@ export default async function DuplicatesPage() {
           <DataTable head={["Cadastro A", "Cadastro B", "Coincidência"]} minWidth={640}>
             {pairs.map((p) => (
               <tr key={`${p.a_id}-${p.b_id}`}>
-                <td><Link href={`/clientes/${p.a_id}`} className="font-medium hover:text-gold-300">{p.a_name}</Link><span className="block text-xs text-ink-500">{contact(p.a_contact)}</span></td>
-                <td><Link href={`/clientes/${p.b_id}`} className="font-medium hover:text-gold-300">{p.b_name}</Link><span className="block text-xs text-ink-500">{contact(p.b_contact)}</span></td>
+                <td><Link href={`/clientes/${p.a_id}`} className="font-medium hover:text-brand-300">{p.a_name}</Link><span className="block text-xs text-ink-500">{contact(p.a_contact)}</span></td>
+                <td><Link href={`/clientes/${p.b_id}`} className="font-medium hover:text-brand-300">{p.b_name}</Link><span className="block text-xs text-ink-500">{contact(p.b_contact)}</span></td>
                 <td><Badge tone="amber">{p.reason}</Badge></td>
               </tr>
             ))}

@@ -17,7 +17,7 @@ export function AppShell({ children, isAdmin, userName, inShop }: { children: Re
       {/* Menu lateral (computador) */}
       <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-ink-800 bg-ink-925 lg:flex">
         <div className="flex h-16 items-center border-b border-ink-800 px-5">
-          <Logo />
+          <Logo className="w-[156px]" />
         </div>
         <div className="px-4 pt-4">
           <Link href="/entrada" className={buttonClass("primary", "md", "w-full")}>
@@ -32,7 +32,7 @@ export function AppShell({ children, isAdmin, userName, inShop }: { children: Re
             <UserCircle2 className="h-8 w-8 shrink-0 text-ink-500" aria-hidden />
             <span className="min-w-0">
               <span className="block truncate text-sm font-semibold text-ink-100">{userName}</span>
-              <span className="block text-[11px] text-gold-400">{roleLabel}</span>
+              <span className="block text-[11px] text-brand-400">{roleLabel}</span>
             </span>
           </Link>
           <form action={signOut}>
@@ -49,7 +49,7 @@ export function AppShell({ children, isAdmin, userName, inShop }: { children: Re
             os elementos fixed do MobileNav (barra inferior, menu e busca) dentro dele. */}
         <div className="absolute inset-0 -z-10 bg-ink-950/85 backdrop-blur-xl" aria-hidden />
         <div className="flex h-14 items-center gap-3 px-4 sm:px-6 lg:h-16">
-          <div className="lg:hidden"><Logo compact /></div>
+          <div className="lg:hidden"><Logo className="w-[118px]" /></div>
           <GlobalSearch className="hidden max-w-md flex-1 lg:block" />
           <div className="ml-auto flex items-center gap-2">
             <Link href="/entrada" className={buttonClass("secondary", "sm", "hidden sm:inline-flex lg:hidden")}><Plus /> Entrada</Link>

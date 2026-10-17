@@ -35,7 +35,7 @@ export function CustomerFields({ c, compact }: { c?: Partial<Customer>; compact?
       </Field>
 
       {!address ? (
-        <button type="button" onClick={() => setAddress(true)} className="text-left text-xs font-semibold text-gold-300 hover:text-gold-200 sm:col-span-6">
+        <button type="button" onClick={() => setAddress(true)} className="text-left text-xs font-semibold text-brand-300 hover:text-brand-200 sm:col-span-6">
           + Adicionar endereço (opcional)
         </button>
       ) : (

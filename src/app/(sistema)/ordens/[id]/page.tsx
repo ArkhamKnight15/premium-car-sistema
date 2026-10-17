@@ -22,8 +22,9 @@ import { QuickStatus } from "@/components/domain/quick-status";
 import { StatusPanel } from "@/components/domain/status-panel";
 import { LiveRefresh } from "@/components/layout/realtime";
 import { PhotoUploader } from "@/components/domain/photo-uploader";
-import { FUEL_LEVELS, PHOTO_KIND } from "@/lib/constants";
+import { FUEL_LEVELS, PHOTO_KIND, isReady } from "@/lib/constants";
 import { dateTime, km, money, moneyInput, osNumber, phone, since, toLocalInput } from "@/lib/format";
+import { orderMessage, whatsappLink } from "@/lib/whatsapp";
 import type { Customer, OrderEvent, OrderItem, OrderPhoto, Payment, ServiceOrder, Vehicle } from "@/lib/types";
 import { addNote, refundPayment, registerPayment, removePhoto, setOrderDiscount, updateOrderInfo } from "@/actions/orders";
 
@@ -66,7 +67,7 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
   const responsible = employees.find((e) => e.id === o.responsible_id);
   const activeEmployees = employees.filter((e) => e.active);
   const wa = c.whatsapp ?? c.phone;
-  const waText = encodeURIComponent(`Olá, ${c.full_name.split(" ")[0]}! Aqui é da Premium Car, sobre o seu ${v.brand} ${v.model} (${osNumber(o.number)}).`);
+  const ready = isReady(o.status);
 
   return (
     <>
@@ -77,7 +78,11 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
         description={<>Entrada em {dateTime(o.entered_at)}{!closed ? ` · há ${since(o.entered_at)} na empresa` : ""}{o.delivered_at ? ` · saída em ${dateTime(o.delivered_at)}` : ""}</>}
         actions={
           <>
-            {wa ? <a href={`https://wa.me/55${wa}?text=${waText}`} target="_blank" rel="noopener noreferrer" className={buttonClass("ghost")}><MessageCircle /> WhatsApp</a> : null}
+            {wa ? (
+              <a href={whatsappLink(wa, orderMessage(c.full_name, v, o.number, o.status))} target="_blank" rel="noopener noreferrer" className={buttonClass(ready ? "outline" : "ghost")}>
+                <MessageCircle /> {ready ? "Avisar que está pronto" : "WhatsApp"}
+              </a>
+            ) : null}
             <Link href={`/ordens/${id}/imprimir`} className={buttonClass("secondary")}><Printer /> Imprimir OS</Link>
           </>
         }
@@ -143,7 +148,7 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
             <CardHeader title="Cliente e veículo" />
             <CardBody className="space-y-4">
               <div>
-                <Link href={`/clientes/${c.id}`} className="font-semibold hover:text-gold-300">{c.full_name}</Link>
+                <Link href={`/clientes/${c.id}`} className="font-semibold hover:text-brand-300">{c.full_name}</Link>
                 <p className="text-sm text-ink-400">{phone(c.whatsapp ?? c.phone)}{c.email ? ` · ${c.email}` : ""}</p>
               </div>
               <Link href={`/veiculos/${v.id}`} className="flex items-center gap-3 rounded-lg border border-ink-800 p-3 hover:border-ink-600">
@@ -161,7 +166,7 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
                 <div className="flex justify-between"><dt className="text-ink-400">Desconto</dt><dd className="tabular-nums">− {money(o.discount)}</dd></div>
                 <div className="flex justify-between border-t border-ink-800 pt-1.5 text-base font-semibold"><dt>Total</dt><dd className="tabular-nums">{money(o.total)}</dd></div>
                 <div className="flex justify-between"><dt className="text-ink-400">Pago</dt><dd className="tabular-nums text-emerald-300">{money(o.amount_paid)}</dd></div>
-                <div className="flex justify-between font-semibold"><dt>Saldo pendente</dt><dd className="tabular-nums text-gold-300">{money(balance)}</dd></div>
+                <div className="flex justify-between font-semibold"><dt>Saldo pendente</dt><dd className="tabular-nums text-brand-300">{money(balance)}</dd></div>
               </dl>
               {canDiscount && !locked ? (
                 <ActionForm action={setOrderDiscount} className="flex items-end gap-2">

@@ -12,11 +12,12 @@
   --color-ink-400: #8d8d99;
   --color-ink-300: #b8b8c2;
   --color-ink-100: #eeeef1;
-  --color-gold-200: #f2e4c2;
-  --color-gold-300: #e4cd98;
-  --color-gold-400: #d4b578;
-  --color-gold-500: #c19e5e;
-  --color-gold-600: #9e8047;
+  /* Laranja da logo Premium Car (#F36020) */
+  --color-brand-200: #fdd3bb;
+  --color-brand-300: #fba878;
+  --color-brand-400: #f8834a;
+  --color-brand-500: #f36020;
+  --color-brand-600: #c94a12;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-michroma), var(--font-inter), ui-sans-serif, sans-serif;
@@ -40,7 +41,7 @@ body {
   font-feature-settings: "cv11", "ss01", "tnum" 0;
 }
 
-::selection { background: var(--color-gold-500); color: var(--color-ink-950); }
+::selection { background: var(--color-brand-500); color: var(--color-ink-950); }
 
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="datetime-local"]::-webkit-calendar-picker-indicator,

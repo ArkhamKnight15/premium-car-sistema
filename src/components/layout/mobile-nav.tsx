@@ -25,8 +25,8 @@ export function MobileNav({ items, userName, roleLabel, signOut }: { items: NavI
       <div className="no-print fixed inset-x-0 bottom-0 z-40 border-t border-ink-800 bg-ink-950/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl lg:hidden">
         <nav className="grid grid-cols-5" aria-label="Navegação rápida">
           {quick.slice(0, 2).map((item) => <Tab key={item.href} item={item} active={isActive(pathname, item.href)} />)}
-          <Link href="/entrada" className="flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-semibold text-gold-300">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gold-500 text-ink-950 shadow-[0_6px_18px_-8px_rgba(193,158,94,0.9)]">
+          <Link href="/entrada" className="flex flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-semibold text-brand-300">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-500 text-ink-950 shadow-[0_6px_18px_-8px_rgba(243,96,32,0.9)]">
               <Plus className="h-5 w-5" />
             </span>
             Entrada
@@ -61,7 +61,7 @@ export function MobileNav({ items, userName, roleLabel, signOut }: { items: NavI
             <div className="mb-5 flex items-center justify-between">
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold">{userName}</p>
-                <p className="text-xs text-gold-400">{roleLabel}</p>
+                <p className="text-xs text-brand-400">{roleLabel}</p>
               </div>
               <button type="button" onClick={() => setMenu(false)} aria-label="Fechar" className="flex h-9 w-9 items-center justify-center rounded-lg border border-ink-700">
                 <X className="h-4 w-4" />
@@ -90,7 +90,7 @@ function Tab({ item, active }: { item: NavItem; active: boolean }) {
   const label = item.href === "/na-empresa" ? "Na empresa" : item.href === "/ordens" ? "OS" : item.label;
   return (
     <Link href={item.href} aria-current={active ? "page" : undefined}
-      className={cn("flex flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium", active ? "text-gold-300" : "text-ink-400")}>
+      className={cn("flex flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium", active ? "text-brand-300" : "text-ink-400")}>
       <Icon className="h-5 w-5" />
       {label}
     </Link>

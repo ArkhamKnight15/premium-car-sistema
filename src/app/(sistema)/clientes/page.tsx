@@ -91,7 +91,7 @@ export default async function CustomersPage({ searchParams }: { searchParams: Pr
             {rows.map((c) => (
               <tr key={c.id}>
                 <td>
-                  <Link href={`/clientes/${c.id}`} className="font-medium text-ink-100 hover:text-gold-300">{c.full_name}</Link>
+                  <Link href={`/clientes/${c.id}`} className="font-medium text-ink-100 hover:text-brand-300">{c.full_name}</Link>
                   <span className="ml-2 text-[10px] font-semibold text-ink-500">{c.person_type}</span>
                 </td>
                 <td className="tabular-nums text-ink-300">{doc(c.document)}</td>

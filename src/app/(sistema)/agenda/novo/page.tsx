@@ -75,8 +75,8 @@ export default async function NewAppointmentPage({ searchParams }: { searchParam
                 <Field name="service_ids" label="Serviços" required>
                   <div className="grid gap-2 sm:grid-cols-2">
                     {services.map((s) => (
-                      <label key={s.id} className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-ink-700 p-3 text-sm has-[:checked]:border-gold-500/60 has-[:checked]:bg-gold-500/5">
-                        <input type="checkbox" name="service_ids" value={s.id} className="mt-0.5 accent-[var(--color-gold-500)]" />
+                      <label key={s.id} className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-ink-700 p-3 text-sm has-[:checked]:border-brand-500/60 has-[:checked]:bg-brand-500/5">
+                        <input type="checkbox" name="service_ids" value={s.id} className="mt-0.5 accent-[var(--color-brand-500)]" />
                         <span>{s.name}<span className="block text-xs text-ink-400">{money(s.default_price)} · {minutes(s.estimated_minutes)}</span></span>
                       </label>
                     ))}

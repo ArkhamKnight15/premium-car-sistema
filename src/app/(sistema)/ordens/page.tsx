@@ -64,7 +64,7 @@ export default async function OrdersPage({ searchParams }: { searchParams: Promi
           <DataTable head={["OS", "Veículo", "Cliente", "Entrada", "Responsável", "Total", "Pagamento", "Status"]} align={["left", "left", "left", "left", "left", "right", "left", "left"]} minWidth={980}>
             {rows.map((o) => (
               <tr key={o.id}>
-                <td><Link href={`/ordens/${o.id}`} className="font-semibold text-gold-300 hover:underline">{osNumber(o.number)}</Link></td>
+                <td><Link href={`/ordens/${o.id}`} className="font-semibold text-brand-300 hover:underline">{osNumber(o.number)}</Link></td>
                 <td>
                   <Link href={`/ordens/${o.id}`} className="flex items-center gap-2">
                     <Plate value={o.vehicles?.plate} size="sm" />

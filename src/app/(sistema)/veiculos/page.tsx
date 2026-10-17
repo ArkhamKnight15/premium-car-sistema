@@ -81,10 +81,10 @@ export default async function VehiclesPage({ searchParams }: { searchParams: Pro
               <tr key={v.id}>
                 <td><Link href={`/veiculos/${v.id}`}><Plate value={v.plate} size="sm" /></Link></td>
                 <td>
-                  <Link href={`/veiculos/${v.id}`} className="font-medium hover:text-gold-300">{v.brand} {v.model}</Link>
+                  <Link href={`/veiculos/${v.id}`} className="font-medium hover:text-brand-300">{v.brand} {v.model}</Link>
                   <span className="block text-xs text-ink-500">{[v.manufacture_year && v.model_year ? `${v.manufacture_year}/${v.model_year}` : v.model_year ?? v.manufacture_year, v.color].filter(Boolean).join(" · ")}</span>
                 </td>
-                <td>{v.customers ? <Link href={`/clientes/${v.customers.id}`} className="text-ink-300 hover:text-gold-300">{v.customers.full_name}</Link> : "—"}</td>
+                <td>{v.customers ? <Link href={`/clientes/${v.customers.id}`} className="text-ink-300 hover:text-brand-300">{v.customers.full_name}</Link> : "—"}</td>
                 <td className="text-ink-300">{VEHICLE_TYPES[v.vehicle_type]}</td>
                 <td className="text-right tabular-nums text-ink-300">{km(v.mileage_km)}</td>
                 <td className="text-center tabular-nums">{v.service_orders?.[0]?.count ?? 0}</td>

@@ -93,7 +93,7 @@ export default async function AgendaPage({ searchParams }: { searchParams: Promi
             {employees.map((e) => <option key={e.id} value={e.id}>{e.full_name}</option>)}
           </Select>
           <label className="flex items-center gap-1.5 text-xs text-ink-400">
-            <input type="checkbox" name="todos" value="1" defaultChecked={showAll} className="accent-[var(--color-gold-500)]" /> Incluir cancelados
+            <input type="checkbox" name="todos" value="1" defaultChecked={showAll} className="accent-[var(--color-brand-500)]" /> Incluir cancelados
           </label>
           <Button type="submit" size="sm" variant="secondary">Aplicar</Button>
         </form>
@@ -110,17 +110,17 @@ export default async function AgendaPage({ searchParams }: { searchParams: Promi
           {Array.from({ length: 7 }, (_, i) => addDays(r.from, i)).map((day) => {
             const list = byDay.get(day) ?? [];
             return (
-              <div key={day} className={cn("min-h-[140px] rounded-xl border bg-ink-900 p-2", day === today ? "border-gold-500/40" : "border-ink-800")}>
+              <div key={day} className={cn("min-h-[140px] rounded-xl border bg-ink-900 p-2", day === today ? "border-brand-500/40" : "border-ink-800")}>
                 <Link href={link({ v: "dia", d: day })} className="mb-2 flex items-baseline justify-between px-1">
                   <span className="text-[11px] font-semibold uppercase tracking-wider text-ink-400">{WEEKDAYS[weekday(day)].slice(0, 3)}</span>
-                  <span className={cn("text-lg font-semibold tabular-nums", day === today ? "text-gold-300" : "")}>{day.slice(8)}</span>
+                  <span className={cn("text-lg font-semibold tabular-nums", day === today ? "text-brand-300" : "")}>{day.slice(8)}</span>
                 </Link>
                 <div className="space-y-1.5">
                   {list.map((a) => (
                     <Link key={a.id} href={`/agenda/${a.id}`} className={cn("block rounded-md border border-ink-800 bg-ink-850 px-2 py-1.5 text-[11px] hover:border-ink-600", a.status === "cancelled" && "opacity-50 line-through")}>
                       <span className="flex items-center gap-1.5">
                         <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", DOTS[APPOINTMENT_STATUS[a.status].tone])} />
-                        <span className="font-semibold tabular-nums text-gold-300">{time(a.starts_at)}</span>
+                        <span className="font-semibold tabular-nums text-brand-300">{time(a.starts_at)}</span>
                         <span className="truncate">{a.customers?.full_name?.split(" ")[0]}</span>
                       </span>
                       <span className="block truncate text-ink-400">{a.vehicles?.model}{a.employee ? ` · ${a.employee.full_name.split(" ")[0]}` : ""}</span>
@@ -143,7 +143,7 @@ function DayRow({ a }: { a: Row }) {
   return (
     <li>
       <Link href={`/agenda/${a.id}`} className="flex flex-wrap items-center gap-4 px-5 py-4 transition-colors hover:bg-ink-850/60 sm:flex-nowrap">
-        <span className="w-24 shrink-0 text-sm font-semibold tabular-nums text-gold-300">{time(a.starts_at)}<span className="block text-xs font-normal text-ink-500">até {time(a.ends_at)}</span></span>
+        <span className="w-24 shrink-0 text-sm font-semibold tabular-nums text-brand-300">{time(a.starts_at)}<span className="block text-xs font-normal text-ink-500">até {time(a.ends_at)}</span></span>
         <span className="min-w-0 flex-1">
           <span className="block truncate font-medium">{a.customers?.full_name}</span>
           <span className="block truncate text-sm text-ink-400">{a.vehicles?.brand} {a.vehicles?.model} {a.vehicles?.plate ? `· ${a.vehicles.plate}` : ""}</span>
@@ -167,10 +167,10 @@ function MonthGrid({ from, to, today, byDay, link }: { from: string; to: string;
         {cells.map((day, i) =>
           !day ? <div key={i} className="min-h-[100px] bg-ink-950" /> : (
             <Link key={day} href={link({ v: "dia", d: day })} className="min-h-[100px] bg-ink-900 p-1.5 transition-colors hover:bg-ink-850">
-              <span className={cn("inline-block rounded px-1 text-xs font-semibold tabular-nums", day === today ? "bg-gold-500 text-ink-950" : "text-ink-300")}>{day.slice(8)}</span>
+              <span className={cn("inline-block rounded px-1 text-xs font-semibold tabular-nums", day === today ? "bg-brand-500 text-ink-950" : "text-ink-300")}>{day.slice(8)}</span>
               <div className="mt-1 space-y-0.5">
                 {(byDay.get(day) ?? []).slice(0, 3).map((a) => (
-                  <p key={a.id} className="truncate text-[10px] text-ink-300"><span className="tabular-nums text-gold-400">{time(a.starts_at)}</span> {a.customers?.full_name?.split(" ")[0]}</p>
+                  <p key={a.id} className="truncate text-[10px] text-ink-300"><span className="tabular-nums text-brand-400">{time(a.starts_at)}</span> {a.customers?.full_name?.split(" ")[0]}</p>
                 ))}
                 {(byDay.get(day) ?? []).length > 3 ? <p className="text-[10px] text-ink-500">+{(byDay.get(day) ?? []).length - 3}</p> : null}
               </div>

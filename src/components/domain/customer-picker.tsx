@@ -52,7 +52,7 @@ export async function CustomerPicker({ basePath, q, canCreate, keep = {} }: { ba
                   {phone(c.whatsapp ?? c.phone)}{c.vehicles.length ? ` · ${c.vehicles.map((v) => v.plate ?? v.model).slice(0, 3).join(", ")}` : ""}
                 </span>
               </span>
-              <span className="text-xs font-semibold text-gold-300">Selecionar →</span>
+              <span className="text-xs font-semibold text-brand-300">Selecionar →</span>
             </Link>
           </li>
         ))}

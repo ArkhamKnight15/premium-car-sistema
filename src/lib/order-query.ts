@@ -15,7 +15,7 @@ export function buildOrderQuery(supabase: Supa, f: OrderFilterValues, columns: s
   const placa = (f.placa ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "");
   const select = [
     columns,
-    cliente ? "customers!inner(id, full_name)" : "customers(id, full_name)",
+    cliente ? "customers!inner(id, full_name, whatsapp, phone)" : "customers(id, full_name, whatsapp, phone)",
     placa ? "vehicles!inner(id, plate, brand, model)" : "vehicles(id, plate, brand, model)",
     f.servico ? "filter_items:service_order_items!inner(service_id)" : "",
   ].filter(Boolean).join(", ");

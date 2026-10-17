@@ -1,6 +1,6 @@
 import type { AppointmentStatus, ItemStatus, OrderStatus, PaymentStatus, PhotoKind, VehicleType } from "./types";
 
-export type Tone = "neutral" | "amber" | "blue" | "cyan" | "violet" | "green" | "red" | "gold";
+export type Tone = "neutral" | "amber" | "blue" | "cyan" | "violet" | "green" | "red" | "brand";
 
 export const ORDER_STATUS: Record<OrderStatus, { label: string; short: string; tone: Tone }> = {
   received: { label: "Recebido", short: "Recebido", tone: "neutral" },
@@ -9,7 +9,7 @@ export const ORDER_STATUS: Record<OrderStatus, { label: string; short: string; t
   in_progress: { label: "Em execução", short: "Execução", tone: "blue" },
   quality_control: { label: "Em controle de qualidade", short: "Qualidade", tone: "violet" },
   completed: { label: "Concluído", short: "Concluído", tone: "green" },
-  awaiting_pickup: { label: "Aguardando retirada", short: "Retirada", tone: "gold" },
+  awaiting_pickup: { label: "Aguardando retirada", short: "Retirada", tone: "brand" },
   delivered: { label: "Entregue", short: "Entregue", tone: "green" },
   cancelled: { label: "Cancelado", short: "Cancelado", tone: "red" },
 };
@@ -18,6 +18,9 @@ export const ORDER_STATUS: Record<OrderStatus, { label: string; short: string; t
 export const FLOW: OrderStatus[] = ["received", "evaluation", "waiting", "in_progress", "quality_control", "completed", "awaiting_pickup", "delivered"];
 export const OPEN_STATUSES: OrderStatus[] = FLOW.slice(0, 7);
 export const CLOSED_STATUSES: OrderStatus[] = ["delivered", "cancelled"];
+/** Veículo pronto: já pode ser retirado pelo cliente. */
+export const READY_STATUSES: OrderStatus[] = ["completed", "awaiting_pickup"];
+export const isReady = (status: OrderStatus) => READY_STATUSES.includes(status);
 
 export const ITEM_STATUS: Record<ItemStatus, { label: string; tone: Tone }> = {
   pending: { label: "Pendente", tone: "neutral" },

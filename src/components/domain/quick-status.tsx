@@ -30,7 +30,7 @@ export function QuickStatus({ orderId, status, balance, compact }: { orderId: st
       <input type="hidden" name="status" value={next} />
       {confirmBalance || (delivering && balance > 0) ? (
         <label className="flex items-start gap-2 rounded-md border border-amber-400/30 bg-amber-400/5 p-2 text-xs text-amber-200">
-          <input type="checkbox" name="allow_balance" className="mt-0.5 accent-[var(--color-gold-500)]" />
+          <input type="checkbox" name="allow_balance" className="mt-0.5 accent-[var(--color-brand-500)]" />
           Entregar com saldo pendente de {money(balance)}
         </label>
       ) : null}
